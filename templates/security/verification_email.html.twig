@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vérifiez votre email – L'Alternative</title>
+    <style>
+        body { margin:0; padding:0; font-family:'Helvetica Neue',Arial,sans-serif; background:#f4efe8; }
+        .wrapper { max-width:600px; margin:0 auto; padding:2rem 1rem; }
+        .card { background:#ffffff; border-radius:16px; overflow:hidden; box-shadow:0 4px 20px rgba(0,0,0,.08); }
+        .header {
+            background: linear-gradient(135deg, #2A3638, #4a6264);
+            padding: 2.5rem 2rem 2rem;
+            text-align: center;
+        }
+        .logo-icon {
+            width: 64px; height: 64px;
+            background: linear-gradient(135deg, #E54A5F, #F1947C, #91B893);
+            border-radius: 14px;
+            display: inline-flex; align-items:center; justify-content:center;
+            margin-bottom: 1rem;
+            font-size: 1.8rem; color: #fff;
+        }
+        .header h1 { color:#fff; font-size:1.6rem; font-weight:800; margin:0 0 .3rem; }
+        .header p  { color:rgba(255,255,255,.75); font-size:.9rem; margin:0; }
+        .body { padding: 2.5rem 2rem; }
+        .greeting { font-size:1.05rem; color:#2A3638; font-weight:600; margin-bottom:.8rem; }
+        .text { font-size:.9rem; color:#475569; line-height:1.7; margin-bottom:1.5rem; }
+        .btn-verify {
+            display:block; width:fit-content; margin:0 auto 1.8rem;
+            background:linear-gradient(135deg, #91B893, #7aa67c);
+            color:#fff !important; text-decoration:none;
+            padding:.85rem 2.2rem; border-radius:10px;
+            font-size:1rem; font-weight:700;
+            box-shadow:0 4px 16px rgba(145,184,147,.4);
+        }
+        .divider { border:none; border-top:1px solid #f1ece5; margin:1.5rem 0; }
+        .fallback { font-size:.8rem; color:#94a3b8; text-align:center; line-height:1.6; }
+        .fallback a { color:#91B893; word-break:break-all; }
+        .footer {
+            background:#faf7f3; padding:1.2rem 2rem;
+            text-align:center; font-size:.75rem; color:#94a3b8; line-height:1.6;
+        }
+        .footer strong { color:#2A3638; }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+    <div class="card">
+        <div class="header">
+            <div class="logo-icon">🌿</div>
+            <h1>L'Alternative</h1>
+            <p>Vérification de votre adresse email</p>
+        </div>
+        <div class="body">
+            <p class="greeting">Bonjour {{ user.prenom ?? user.email }} 👋</p>
+            <p class="text">
+                Merci de vous être inscrit(e) sur <strong>L'Alternative</strong> !<br>
+                Pour activer votre compte et commencer à explorer les alternatives aux produits boycottés,
+                veuillez confirmer votre adresse email en cliquant sur le bouton ci-dessous.
+            </p>
+
+            <a href="{{ verifyUrl }}" class="btn-verify">
+                ✅ Vérifier mon email
+            </a>
+
+            <hr class="divider">
+
+            <p class="fallback">
+                Si le bouton ne fonctionne pas, copiez-collez ce lien dans votre navigateur :<br>
+                <a href="{{ verifyUrl }}">{{ verifyUrl }}</a>
+            </p>
+            <p class="fallback" style="margin-top:.8rem">
+                Ce lien est valable pour une utilisation unique.<br>
+                Si vous n'avez pas créé de compte, ignorez cet email.
+            </p>
+        </div>
+        <div class="footer">
+            <strong>L'Alternative</strong> — Consommons autrement 🌿<br>
+            Cet email a été envoyé automatiquement, merci de ne pas y répondre.
+        </div>
+    </div>
+</div>
+</body>
+</html>

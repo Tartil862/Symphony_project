@@ -1,0 +1,6 @@
+{{ form_start(form) }}
+    {{ form_widget(form) }}
+    <div class="mt-4">
+        <button class="btn btn-accent"><i class="bi bi-check-lg me-1"></i>{{ button_label|default('common.save'|trans) }}</button>
+    </div>
+{{ form_end(form) }}

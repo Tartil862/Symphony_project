@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="{{ app.request.locale }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Anti-FOUC: apply saved theme instantly -->
+    <script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})()</script>
+    <title>{{ 'auth.create_account'|trans }} – {{ 'brand.name'|trans }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            background: #2A3638;
+            overflow: hidden;
+        }
+
+        /* ── Left panel ────────────────────── */
+        .auth-left {
+            flex: 1;
+            background: #0e1a16;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+        /* Blurred Jerusalem image */
+        .auth-left::before {
+            content: '';
+            position: absolute;
+            inset: -20px;
+            background: url('/images/qods.jpg') center / cover no-repeat;
+            filter: blur(6px);
+            z-index: 0;
+        }
+        /* Dark overlay so text stays readable */
+        .auth-left::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(160deg, rgba(10,20,15,.72) 0%, rgba(20,38,28,.78) 60%, rgba(30,20,18,.70) 100%);
+            z-index: 1;
+        }
+
+        .auth-left .brand {
+            position: relative; z-index: 2;
+            text-align: center;        }        }
+         .auth-left .brand .logo-icon {
+            width: 72px; height: 72px;
+            background: linear-gradient(135deg, #E54A5F, #F1947C, #91B893);
+            border-radius: 1.2rem;
+            display: inline-grid; place-items: center;
+            color: #fff; font-size: 2rem;
+            box-shadow: 0 8px 32px rgba(229,74,95,.4);
+            margin-bottom: 1.5rem;
+            animation: logoPulse 3s ease-in-out infinite;
+        }
+        @keyframes logoPulse {
+            0%, 100% { box-shadow: 0 8px 32px rgba(145,184,147,.4); }
+            50% { box-shadow: 0 12px 48px rgba(145,184,147,.6); }
+        }
+        .auth-left .brand h1 {
+            font-size: 2.4rem; font-weight: 800;
+            color: #fff;
+            text-shadow: 0 2px 16px rgba(0,0,0,.5);
+            margin-bottom: .5rem;
+        }
+        .auth-left .brand p {
+            color: rgba(255,255,255,.82); font-size: 1rem; font-weight: 400;
+            max-width: 320px;
+            text-shadow: 0 1px 8px rgba(0,0,0,.6);
+        }
+
+        .floating-shapes {
+            position: absolute; inset: 0; z-index: 2;
+            pointer-events: none;
+        }
+        .floating-shapes span {
+            position: absolute;
+            border: 2px solid rgba(145,184,147,.12);
+            border-radius: 50%;
+            animation: floatShape 12s linear infinite;
+        }
+        .floating-shapes span:nth-child(1) { width:80px;height:80px;top:20%;left:15%;animation-delay:0s;animation-duration:15s }
+        .floating-shapes span:nth-child(2) { width:55px;height:55px;top:55%;left:75%;animation-delay:2s;animation-duration:11s }
+        .floating-shapes span:nth-child(3) { width:100px;height:100px;top:70%;left:25%;animation-delay:4s;animation-duration:14s }
+        .floating-shapes span:nth-child(4) { width:35px;height:35px;top:30%;left:65%;animation-delay:1s;animation-duration:12s }
+        @keyframes floatShape {
+            0%, 100% { transform: translateY(0) rotate(0deg); opacity:.3; }
+            50% { transform: translateY(-40px) rotate(180deg); opacity:.6; }
+        }
+
+        /* ── Right panel ─────────────────────────── */
+        .auth-right {
+            width: 520px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 3rem;
+            background: #fff;
+            position: relative;
+        }
+
+        .auth-form-wrapper {
+            max-width: 380px;
+            margin: 0 auto;
+            width: 100%;
+            animation: slideIn .6s cubic-bezier(.4,0,.2,1);
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(30px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+
+        .auth-form-wrapper h2 {
+            font-size: 1.8rem; font-weight: 700; color: #2A3638;
+            margin-bottom: .35rem;
+        }
+        .auth-form-wrapper .subtitle {
+            color: #6b7280; font-size: .92rem; margin-bottom: 2rem;
+        }
+
+        .form-floating { margin-bottom: 1.2rem; }
+        .form-floating .form-control {
+            border: 2px solid #ddd0bf;
+            border-radius: .7rem;
+            padding: 1rem .9rem .4rem;
+            font-size: .9rem;
+            transition: all .3s cubic-bezier(.4,0,.2,1);
+            height: 56px;
+        }
+        .form-floating .form-control:focus {
+            border-color: #91B893;
+            box-shadow: 0 0 0 4px rgba(145,184,147,.1);
+        }
+        .form-floating label {
+            color: #9ca3af; font-weight: 500; font-size: .88rem;
+        }
+
+        .btn-register {
+            width: 100%;
+            padding: .8rem;
+            background: linear-gradient(135deg, #91B893, #7aa67c, #5e8960);
+            color: #fff; border: none;
+            border-radius: .7rem;
+            font-size: 1rem; font-weight: 600;
+            transition: all .35s cubic-bezier(.4,0,.2,1);
+            box-shadow: 0 4px 18px rgba(145,184,147,.35);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-register::after {
+            content: '';
+            position: absolute; inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,.15), transparent);
+            opacity: 0;
+            transition: opacity .3s ease;
+        }
+        .btn-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(145,184,147,.5);
+        }
+        .btn-register:hover::after { opacity: 1; }
+        .btn-register:active { transform: translateY(0) scale(.98); }
+
+        .login-link {
+            text-align: center;
+            margin-top: 1.8rem;
+            color: #6b7280; font-size: .88rem;
+        }
+        .login-link a {
+            color: #E54A5F; font-weight: 600; text-decoration: none;
+            transition: color .2s ease;
+        }
+        .login-link a:hover { color: #c93d4f; }
+
+        .form-errors {
+            background: linear-gradient(135deg, #fef2f2, #f9d4d8);
+            border: 1px solid #f0a8b2;
+            color: #c93d4f;
+            border-radius: .7rem;
+            padding: .75rem 1rem;
+            font-size: .82rem; font-weight: 500;
+            margin-bottom: 1.2rem;
+        }
+        .form-errors ul { margin: 0; padding-left: 1.2rem; }
+
+        @media (max-width: 991.98px) {
+            .auth-left { display: none; }
+            .auth-right {
+                width: 100%; min-height: 100vh;
+                background: linear-gradient(180deg, #FAF6F1 0%, #fff 100%);
+            }
+        }
+
+        /* ── Dark mode overrides ──────────────────── */
+        html[data-theme="dark"] body { background: #0d1117 !important; }
+        html[data-theme="dark"] .auth-right { background: #161b22 !important; }
+        html[data-theme="dark"] .auth-form-wrapper h2 { color: #c9d1d9 !important; }
+        html[data-theme="dark"] .auth-form-wrapper .subtitle { color: #8b949e !important; }
+        html[data-theme="dark"] .form-floating .form-control {
+            background: #0d1117 !important;
+            color: #c9d1d9 !important;
+            border-color: #30363d !important;
+        }
+        html[data-theme="dark"] .form-floating .form-control:focus {
+            border-color: #91B893 !important;
+            box-shadow: 0 0 0 4px rgba(145,184,147,.1) !important;
+            background: #0d1117 !important;
+        }
+        html[data-theme="dark"] .form-floating label { color: #6e7681 !important; }
+        html[data-theme="dark"] .form-floating > .form-control:not(:placeholder-shown) ~ label,
+        html[data-theme="dark"] .form-floating > .form-control:focus ~ label { color: #8b949e !important; }
+        html[data-theme="dark"] .login-link { color: #8b949e !important; }
+        html[data-theme="dark"] .form-errors {
+            background: linear-gradient(135deg, #2d1a1e, #3a1c20) !important;
+            border-color: #5a2d32 !important; color: #E54A5F !important;
+        }
+        #themeToggleAuth {
+            background: none; border: 1px solid rgba(255,255,255,.2); cursor: pointer;
+            padding: .2rem .45rem; border-radius: .3rem; color: rgba(255,255,255,.75);
+            font-size: .85rem; line-height: 1.4; transition: all .2s ease;
+        }
+        #themeToggleAuth:hover { background: rgba(255,255,255,.1); color: #fff; }
+
+        /* Locale / theme bar — visible in both light + dark modes */
+        .auth-locale-bar {
+            background: rgba(42,54,56,.55);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,.12);
+            border-radius: .6rem;
+            padding: .3rem .5rem;
+            display: flex; gap: .4rem; align-items: center;
+        }
+        html:not([data-theme="dark"]) .auth-locale-bar {
+            background: rgba(255,255,255,.85);
+            border-color: rgba(0,0,0,.1);
+        }
+        html:not([data-theme="dark"]) .auth-locale-bar a {
+            color: #2A3638 !important;
+            border-color: rgba(42,54,56,.25) !important;
+        }
+        html:not([data-theme="dark"]) .auth-locale-bar a.active-locale {
+            color: #fff !important;
+            background: #2A3638;
+            border-color: #2A3638 !important;
+        }
+        html:not([data-theme="dark"]) #themeToggleAuth {
+            color: #2A3638 !important;
+            border-color: rgba(42,54,56,.3) !important;
+        }
+        html:not([data-theme="dark"]) #themeToggleAuth:hover {
+            background: rgba(42,54,56,.08) !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Left panel -->
+    <div class="auth-left">
+        <div class="floating-shapes">
+            <span></span><span></span><span></span><span></span>
+        </div>
+        <div class="brand">
+            <div class="logo-icon"><i class="bi bi-flag-fill"></i></div>
+            <h1>{{ 'brand.name'|trans }}</h1>
+            <p>{{ 'brand.tagline'|trans }}</p>
+        </div>
+    </div>
+
+    <!-- Language switcher + theme toggle -->
+    <div class="auth-locale-bar" style="position:fixed;top:1rem;right:1rem;z-index:100">
+        <button id="themeToggleAuth" onclick="(function(){var c=document.documentElement.getAttribute('data-theme')||'light';var n=c==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);localStorage.setItem('theme',n);document.getElementById('themeIconAuth').className='bi bi-'+(n==='dark'?'sun':'moon');})()" title="Toggle dark/light"><i class="bi" id="themeIconAuth"></i></button>
+        {% set loc = app.request.locale %}
+        <a href="{{ path('app_switch_locale', {locale: 'fr'}) }}" class="{{ loc=='fr' ? 'active-locale' : '' }}" style="font-size:.75rem;font-weight:{{ loc=='fr' ? '700' : '400' }};color:{{ loc=='fr' ? '#fff' : 'rgba(255,255,255,.6)' }};text-decoration:none;padding:.2rem .5rem;border-radius:.3rem;border:1px solid {{ loc=='fr' ? 'rgba(255,255,255,.4)' : 'rgba(255,255,255,.15)' }};transition:all .2s">FR</a>
+        <a href="{{ path('app_switch_locale', {locale: 'en'}) }}" class="{{ loc=='en' ? 'active-locale' : '' }}" style="font-size:.75rem;font-weight:{{ loc=='en' ? '700' : '400' }};color:{{ loc=='en' ? '#fff' : 'rgba(255,255,255,.6)' }};text-decoration:none;padding:.2rem .5rem;border-radius:.3rem;border:1px solid {{ loc=='en' ? 'rgba(255,255,255,.4)' : 'rgba(255,255,255,.15)' }};transition:all .2s">EN</a>
+    </div>
+
+    <!-- Right panel -->
+    <div class="auth-right">
+        <div class="auth-form-wrapper">
+            <h2>{{ 'auth.create_account'|trans }}</h2>
+            <p class="subtitle">{{ 'auth.fill_details'|trans }}</p>
+
+            {{ form_start(registrationForm, {'attr': {'novalidate': 'novalidate'}}) }}
+
+                {% if registrationForm.vars.errors|length > 0 %}
+                    <div class="form-errors">
+                        {{ form_errors(registrationForm) }}
+                    </div>
+                {% endif %}
+
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem">
+                    <div class="form-floating">
+                        {{ form_widget(registrationForm.prenom, {
+                            'attr': {'class': 'form-control', 'placeholder': 'auth.prenom'|trans}
+                        }) }}
+                        <label><i class="bi bi-person me-2"></i>{{ 'auth.prenom'|trans }}</label>
+                        {{ form_errors(registrationForm.prenom) }}
+                    </div>
+                    <div class="form-floating">
+                        {{ form_widget(registrationForm.nom, {
+                            'attr': {'class': 'form-control', 'placeholder': 'auth.nom'|trans}
+                        }) }}
+                        <label><i class="bi bi-person me-2"></i>{{ 'auth.nom'|trans }}</label>
+                        {{ form_errors(registrationForm.nom) }}
+                    </div>
+                </div>
+
+                <div class="form-floating">
+                    {{ form_widget(registrationForm.email, {
+                        'attr': {'class': 'form-control', 'placeholder': 'name@example.com'}
+                    }) }}
+                    <label><i class="bi bi-envelope me-2"></i>{{ 'auth.email'|trans }}</label>
+                    {{ form_errors(registrationForm.email) }}
+                </div>
+
+                <div class="form-floating">
+                    {{ form_widget(registrationForm.plainPassword.first, {
+                        'attr': {'class': 'form-control', 'placeholder': 'Password'}
+                    }) }}
+                    <label><i class="bi bi-lock me-2"></i>{{ 'auth.password'|trans }}</label>
+                    {{ form_errors(registrationForm.plainPassword.first) }}
+                </div>
+
+                <div class="form-floating">
+                    {{ form_widget(registrationForm.plainPassword.second, {
+                        'attr': {'class': 'form-control', 'placeholder': 'Confirm'}
+                    }) }}
+                    <label><i class="bi bi-shield-lock me-2"></i>{{ 'auth.confirm_password'|trans }}</label>
+                    {{ form_errors(registrationForm.plainPassword.second) }}
+                </div>
+
+                <button class="btn-register" type="submit">
+                    <i class="bi bi-person-check me-2"></i>{{ 'auth.create_account'|trans }}
+                </button>
+
+            {{ form_end(registrationForm) }}
+
+            <div class="login-link">
+                {{ 'auth.already_account'|trans }} <a href="{{ path('app_login') }}">{{ 'auth.login_link'|trans }}</a>
+            </div>
+        </div>
+    </div>
+<script>document.getElementById('themeIconAuth').className='bi bi-'+(localStorage.getItem('theme')==='dark'?'sun':'moon');</script>
+</body>
+</html>

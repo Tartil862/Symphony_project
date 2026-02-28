@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'category.new'|trans }}{% endblock %}
+
+{% block page_title %}{{ 'category.new'|trans }}{% endblock %}
+
+{% block body %}
+    <div class="mb-4">
+        <a href="{{ path('app_category_index') }}" class="btn btn-ghost">
+            <i class="bi bi-arrow-left me-1"></i> {{ 'category.title'|trans }}
+        </a>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <div class="card">
+                <div class="card-header">
+                    <i class="bi bi-plus-circle me-2"></i>{{ 'category.new'|trans }}
+                </div>
+                <div class="card-body p-4">
+                    {{ include('category/_form.html.twig') }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

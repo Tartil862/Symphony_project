@@ -1,0 +1,554 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'cart.title'|trans }}{% endblock %}
+{% block page_title %}🛒 {{ 'cart.title'|trans }}{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .cart-container {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    .cart-item {
+        display: flex;
+        align-items: center;
+        gap: 1.2rem;
+        padding: 1.2rem;
+        background: #fff;
+        border-radius: 1rem;
+        margin-bottom: .8rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,.04);
+        transition: all .3s cubic-bezier(.4,0,.2,1);
+        animation: fadeSlideUp .4s ease;
+    }
+    .cart-item:hover {
+        box-shadow: 0 8px 24px rgba(42,54,56,.1);
+        transform: translateX(4px);
+    }
+
+    .cart-item-img {
+        width: 80px;
+        height: 80px;
+        border-radius: .8rem;
+        object-fit: cover;
+        flex-shrink: 0;
+    }
+    .cart-item-placeholder {
+        width: 80px;
+        height: 80px;
+        border-radius: .8rem;
+        background: linear-gradient(135deg, #f5f0ea, #efe8df);
+        display: grid;
+        place-items: center;
+        color: #E5C6A4;
+        font-size: 1.5rem;
+        flex-shrink: 0;
+    }
+
+    .cart-item-info {
+        flex: 1;
+        min-width: 0;
+    }
+    .cart-item-name {
+        font-weight: 700;
+        font-size: 1rem;
+        color: #1e293b;
+        margin-bottom: .2rem;
+    }
+    .cart-item-price {
+        font-size: .85rem;
+        color: #E54A5F;
+        font-weight: 600;
+    }
+
+    .cart-item-qty {
+        display: flex;
+        align-items: center;
+        gap: .4rem;
+    }
+    .cart-item-qty a {
+        width: 32px;
+        height: 32px;
+        border-radius: .5rem;
+        display: grid;
+        place-items: center;
+        text-decoration: none;
+        font-size: .9rem;
+        font-weight: 700;
+        transition: all .25s ease;
+    }
+    .qty-minus {
+        background: #f9d4d8;
+        color: #E54A5F;
+    }
+    .qty-minus:hover {
+        background: #E54A5F;
+        color: #fff;
+    }
+    .qty-plus {
+        background: #dde8de;
+        color: #7aa67c;
+    }
+    .qty-plus:hover {
+        background: #91B893;
+        color: #fff;
+    }
+    .qty-value {
+        width: 40px;
+        text-align: center;
+        font-weight: 700;
+        font-size: 1rem;
+        color: #1e293b;
+    }
+
+    .cart-item-subtotal {
+        font-weight: 800;
+        font-size: 1.05rem;
+        color: #2A3638;
+        min-width: 90px;
+        text-align: right;
+    }
+
+    .cart-item-remove a {
+        color: #E54A5F;
+        font-size: 1.1rem;
+        transition: all .3s var(--transition-bounce);
+        text-decoration: none;
+    }
+    .cart-item-remove a:hover {
+        transform: scale(1.3);
+        color: #c93d4f;
+    }
+
+    .cart-summary {
+        background: linear-gradient(135deg, #fefefe, #FAF6F1);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        margin-top: 1.5rem;
+        box-shadow: 0 2px 12px rgba(0,0,0,.06);
+    }
+    .cart-summary-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: .6rem 0;
+    }
+    .cart-summary-label {
+        color: #64748b;
+        font-weight: 500;
+    }
+    .cart-summary-total {
+        font-size: 1.5rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #E54A5F, #F1947C);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .cart-actions {
+        display: flex;
+        gap: .8rem;
+        margin-top: 1.2rem;
+    }
+    .btn-checkout {
+        background: linear-gradient(135deg, #91B893, #7aa67c);
+        color: #fff;
+        border: none;
+        padding: .7rem 2rem;
+        border-radius: .7rem;
+        font-weight: 700;
+        font-size: .95rem;
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        transition: all .35s cubic-bezier(.4,0,.2,1);
+        box-shadow: 0 4px 15px rgba(145,184,147,.3);
+        text-decoration: none;
+        flex: 1;
+        justify-content: center;
+    }
+    .btn-checkout:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(145,184,147,.4);
+        color: #fff;
+    }
+    .btn-clear {
+        background: #f9d4d8;
+        color: #E54A5F;
+        border: none;
+        padding: .7rem 1.5rem;
+        border-radius: .7rem;
+        font-weight: 600;
+        font-size: .85rem;
+        display: flex;
+        align-items: center;
+        gap: .4rem;
+        transition: all .3s ease;
+        text-decoration: none;
+    }
+    .btn-clear:hover {
+        background: #E54A5F;
+        color: #fff;
+    }
+
+    .btn-continue {
+        background: transparent;
+        border: 2px solid #2A3638;
+        color: #2A3638;
+        padding: .7rem 1.5rem;
+        border-radius: .7rem;
+        font-weight: 600;
+        font-size: .85rem;
+        display: flex;
+        align-items: center;
+        gap: .4rem;
+        transition: all .3s ease;
+        text-decoration: none;
+    }
+    .btn-continue:hover {
+        background: #2A3638;
+        color: #fff;
+    }
+
+    .empty-cart {
+        text-align: center;
+        padding: 4rem 2rem;
+    }
+    .empty-cart i {
+        font-size: 5rem;
+        color: #ddd0bf;
+        margin-bottom: 1rem;
+    }
+    .empty-cart h4 {
+        color: #64748b;
+        font-weight: 600;
+    }
+    .empty-cart p {
+        color: #94a3b8;
+    }
+
+    .flash-toast {
+        position: fixed;
+        top: 80px;
+        right: 2rem;
+        z-index: 9999;
+        animation: slideInRight .4s cubic-bezier(.4,0,.2,1);
+    }
+    @keyframes slideInRight {
+        from { opacity: 0; transform: translateX(40px); }
+        to   { opacity: 1; transform: translateX(0); }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+    {# Flash messages #}
+    {% for type, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="flash-toast">
+                <div class="alert alert-{{ type == 'success' ? 'success' : (type == 'warning' ? 'warning' : 'info') }} alert-dismissible fade show d-flex align-items-center gap-2" style="border-radius:.8rem;border:none;box-shadow:0 8px 25px rgba(0,0,0,.1)">
+                    <i class="bi bi-{{ type == 'success' ? 'check-circle-fill' : 'info-circle-fill' }}"></i>
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    <div class="cart-container">
+        {% if cartItems is empty %}
+            <div class="empty-cart">
+                <i class="bi bi-cart-x"></i>
+                <h4>{{ 'cart.empty'|trans }}</h4>
+                <p>{{ 'dashboard.no_products'|trans }}</p>
+                <a href="{{ path('app_dashboard') }}" class="btn-accent mt-3 d-inline-flex align-items-center gap-2">
+                    <i class="bi bi-arrow-left"></i> {{ 'cart.continue'|trans }}
+                </a>
+            </div>
+        {% else %}
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h5 style="font-weight:700;color:#2A3638;margin:0">
+                    <i class="bi bi-bag-fill"></i> {{ cartItems|length }} article{{ cartItems|length > 1 ? 's' : '' }}
+                </h5>
+            </div>
+
+            {% for item in cartItems %}
+                <div class="cart-item">
+                    {% if item.product.image %}
+                        <img src="{{ asset(item.product.imageFolder ~ '/' ~ item.product.image) }}" alt="{{ item.product.label }}" class="cart-item-img">
+                    {% else %}
+                        <div class="cart-item-placeholder">
+                            <i class="bi bi-image"></i>
+                        </div>
+                    {% endif %}
+
+                    <div class="cart-item-info">
+                        <div class="cart-item-name">{{ item.product.label }}</div>
+                        <div class="cart-item-price">{{ item.product.price is not null ? (item.product.price|number_format(2, '.', ',') ~ ' DT / unité') : '—' }}</div>
+                    </div>
+
+                    <div class="cart-item-qty">
+                        <a href="{{ path('app_cart_decrease', {id: item.product.id}) }}" class="qty-minus">−</a>
+                        <span class="qty-value">{{ item.quantity }}</span>
+                        <a href="{{ path('app_cart_increase', {id: item.product.id}) }}" class="qty-plus">+</a>
+                    </div>
+
+                    <div class="cart-item-subtotal">{{ item.subtotal|number_format(2, '.', ',') }} DT</div>
+
+                    <div class="cart-item-remove">
+                        <a href="{{ path('app_cart_remove', {id: item.product.id}) }}" title="Retirer"
+                           data-confirm="'{{ item.product.label }}' sera retiré de votre panier."
+                           data-confirm-title="Retirer cet article ?"
+                           data-confirm-icon="bi-cart-dash"
+                           data-confirm-variant="warning"
+                           data-confirm-btn="Retirer">
+                            <i class="bi bi-trash3"></i>
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+
+            <div class="cart-summary">
+                <div class="cart-summary-row">
+                    <span class="cart-summary-label">Nombre d'articles</span>
+                    <span style="font-weight:600;color:#1e293b">
+                        {% set totalQty = 0 %}
+                        {% for item in cartItems %}{% set totalQty = totalQty + item.quantity %}{% endfor %}
+                        {{ totalQty }}
+                    </span>
+                </div>
+
+                {# ── Coupon section ─────────────────────────────────────────── #}
+                {% if appliedCoupon %}
+                    {# Coupon is applied → show green success bar #}
+                    <div style="background:linear-gradient(135deg,#dcfce7,#f0fdf4);border:2px solid #4ade80;border-radius:.9rem;padding:1rem 1.2rem;margin:.9rem 0;">
+                        <div style="display:flex;align-items:center;justify-content:space-between;gap:.8rem;flex-wrap:wrap;">
+                            <div style="display:flex;align-items:center;gap:.7rem;">
+                                <span style="background:#22c55e;border-radius:50%;width:2.2rem;height:2.2rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                    <i class="bi bi-ticket-perforated-fill" style="color:#fff;font-size:1rem;"></i>
+                                </span>
+                                <div>
+                                    <div style="font-weight:700;color:#15803d;font-size:.95rem;">{{ 'coupon.applied_title'|trans }}</div>
+                                    <div style="font-size:.82rem;color:#16a34a;">
+                                        {{ 'coupon.applied_desc'|trans({'%rate%': (appliedCoupon.discountRate * 100)|round}) }}
+                                        {% if appliedCoupon.categoryName %}
+                                            &bull; <strong>{{ 'coupon.category_only'|trans({'%cat%': appliedCoupon.categoryName}) }}</strong>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="display:flex;align-items:center;gap:.6rem;">
+                                <code style="background:#bbf7d0;color:#166534;padding:.3rem .7rem;border-radius:.4rem;font-weight:700;font-size:.9rem;letter-spacing:.05em;">{{ appliedCoupon.code }}</code>
+                                <a href="{{ path('app_cart_remove_coupon') }}" style="color:#dc2626;font-size:.8rem;text-decoration:none;font-weight:600;" title="{{ 'coupon.remove'|trans }}">
+                                    <i class="bi bi-x-circle-fill"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% elseif userCoupon %}
+                    {# User has an unused coupon → invite them to apply it #}
+                    <div style="background:linear-gradient(135deg,#fef9c3,#fefce8);border:2px dashed #facc15;border-radius:.9rem;padding:1rem 1.2rem;margin:.9rem 0;">
+                        <div style="display:flex;align-items:center;gap:.7rem;margin-bottom:.7rem;">
+                            <span style="background:linear-gradient(135deg,#f59e0b,#fbbf24);border-radius:50%;width:2.2rem;height:2.2rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                <i class="bi bi-gift-fill" style="color:#fff;font-size:1rem;"></i>
+                            </span>
+                            <div>
+                                <div style="font-weight:700;color:#92400e;font-size:.95rem;">{{ 'coupon.available_title'|trans }}</div>
+                                <div style="font-size:.8rem;color:#b45309;">
+                                    {{ 'coupon.available_desc'|trans({'%rate%': (userCoupon.discountRate * 100)|round}) }}
+                                    {% if userCoupon.categoryName %}
+                                        &mdash; <span style="background:#fde68a;padding:.1rem .45rem;border-radius:.3rem;font-size:.75rem;font-weight:700;">
+                                            <i class="bi bi-tag-fill"></i> {{ userCoupon.categoryName }} {{ 'coupon.only'|trans }}
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;">
+                            <code id="coupon-code-display" style="background:#fde68a;color:#78350f;padding:.35rem .85rem;border-radius:.5rem;font-weight:800;font-size:1rem;letter-spacing:.08em;cursor:pointer;" title="{{ 'coupon.click_copy'|trans }}" onclick="copyCouponCode()">{{ userCoupon.code }}</code>
+                            <button type="button" onclick="copyCouponCode()" style="background:#f59e0b;color:#fff;border:none;border-radius:.5rem;padding:.35rem .8rem;font-size:.8rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:.3rem;">
+                                <i class="bi bi-clipboard" id="copy-icon"></i> {{ 'coupon.copy_code'|trans }}
+                            </button>
+                            <form method="post" action="{{ path('app_cart_apply_coupon') }}" style="display:contents">
+                                <input type="hidden" name="coupon_code" value="{{ userCoupon.code }}">
+                                <button type="submit" style="background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;border:none;border-radius:.5rem;padding:.35rem .85rem;font-size:.8rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:.3rem;">
+                                    <i class="bi bi-check2-circle"></i> {{ 'coupon.apply_btn'|trans }}
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                {% endif %}
+
+                {# Manual coupon input (if no coupon applied) #}
+                {% if not appliedCoupon %}
+                    <div style="margin:.6rem 0">
+                        <form method="post" action="{{ path('app_cart_apply_coupon') }}" style="display:flex;gap:.5rem;align-items:stretch;">
+                            <input type="text" name="coupon_code" placeholder="{{ 'coupon.enter_code'|trans }}" maxlength="20"
+                                   style="flex:1;border:1.5px solid #e2e8f0;border-radius:.6rem;padding:.45rem .75rem;font-size:.85rem;outline:none;font-family:monospace;text-transform:uppercase;">
+                            <button type="submit" style="background:#2A3638;color:#fff;border:none;border-radius:.6rem;padding:.45rem 1rem;font-size:.82rem;font-weight:600;cursor:pointer;white-space:nowrap;">
+                                <i class="bi bi-ticket-perforated"></i> {{ 'coupon.redeem'|trans }}
+                            </button>
+                        </form>
+                    </div>
+                {% endif %}
+
+                {# ── Wallet section ─────────────────────────────────────────── #}
+                <div style="background:linear-gradient(135deg,#f0f4ff,#e8eeff);border:2px solid #a5b4fc;border-radius:.9rem;padding:1rem 1.2rem;margin:.9rem 0;">
+                    <div style="display:flex;align-items:center;gap:.7rem;margin-bottom:.8rem;">
+                        <span style="background:linear-gradient(135deg,#6366f1,#818cf8);border-radius:50%;width:2.2rem;height:2.2rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                            <i class="bi bi-wallet2" style="color:#fff;font-size:1rem;"></i>
+                        </span>
+                        <div>
+                            <div style="font-weight:700;color:#3730a3;font-size:.95rem;">{{ 'wallet.title'|trans }}</div>
+                            <div style="font-size:.8rem;color:#4f46e5;">
+                                {{ 'wallet.your_pts'|trans }} : <strong>{{ userReputation }} pts</strong>
+                                &nbsp;|&nbsp;
+                                {{ 'wallet.balance'|trans }} : <strong>{{ walletBalance|number_format(2, '.', ',') }} DT</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if walletApplied %}
+                        {# Wallet credit is active on this order #}
+                        <div style="display:flex;align-items:center;justify-content:space-between;gap:.5rem;flex-wrap:wrap;">
+                            <span style="color:#3730a3;font-weight:700;font-size:.9rem;"><i class="bi bi-check-circle-fill" style="color:#22c55e;"></i> {{ 'wallet.applied_title'|trans }} (−{{ walletDiscount|number_format(2, '.', ',') }} DT)</span>
+                            <a href="{{ path('app_cart_wallet_remove') }}" style="color:#dc2626;font-size:.8rem;font-weight:600;text-decoration:none;">
+                                <i class="bi bi-x-circle"></i> {{ 'wallet.remove_btn'|trans }}
+                            </a>
+                        </div>
+                    {% elseif walletBalance > 0 %}
+                        {# User has wallet credit but hasn't applied it yet #}
+                        <div style="display:flex;align-items:center;justify-content:space-between;gap:.5rem;flex-wrap:wrap;margin-bottom:.7rem;">
+                            <span style="font-size:.85rem;color:#4338ca;">{{ 'wallet.balance'|trans }} : <strong>{{ walletBalance|number_format(2, '.', ',') }} DT</strong></span>
+                            <a href="{{ path('app_cart_wallet_apply') }}" style="background:linear-gradient(135deg,#6366f1,#818cf8);color:#fff;padding:.35rem .9rem;border-radius:.5rem;font-size:.82rem;font-weight:700;text-decoration:none;display:flex;align-items:center;gap:.3rem;">
+                                <i class="bi bi-wallet-fill"></i> {{ 'wallet.apply_btn'|trans }}
+                            </a>
+                        </div>
+                        {% if userReputation >= 100 %}
+                            <form method="post" action="{{ path('app_cart_wallet_convert') }}" style="display:flex;gap:.5rem;align-items:stretch;margin-top:.4rem;">
+                                <input type="number" name="points_to_convert" min="100" max="{{ userReputation }}" step="100" value="100"
+                                       placeholder="{{ 'wallet.points_label'|trans }}"
+                                       style="flex:1;border:1.5px solid #a5b4fc;border-radius:.6rem;padding:.4rem .7rem;font-size:.85rem;outline:none;">
+                                <button type="submit" style="background:#6366f1;color:#fff;border:none;border-radius:.6rem;padding:.4rem .9rem;font-size:.82rem;font-weight:600;cursor:pointer;white-space:nowrap;">
+                                    <i class="bi bi-arrow-repeat"></i> {{ 'wallet.convert_btn'|trans }}
+                                </button>
+                            </form>
+                            <div style="font-size:.75rem;color:#6366f1;margin-top:.3rem;"><i class="bi bi-info-circle"></i> {{ 'wallet.convert_desc'|trans }}</div>
+                        {% endif %}
+                    {% elseif userReputation >= 100 %}
+                        {# No wallet credit yet, but user has pts to convert #}
+                        <form method="post" action="{{ path('app_cart_wallet_convert') }}" style="display:flex;gap:.5rem;align-items:stretch;margin-bottom:.3rem;">
+                            <input type="number" name="points_to_convert" min="100" max="{{ userReputation }}" step="100" value="100"
+                                   placeholder="{{ 'wallet.points_label'|trans }}"
+                                   style="flex:1;border:1.5px solid #a5b4fc;border-radius:.6rem;padding:.4rem .7rem;font-size:.85rem;outline:none;">
+                            <button type="submit" style="background:#6366f1;color:#fff;border:none;border-radius:.6rem;padding:.4rem .9rem;font-size:.82rem;font-weight:600;cursor:pointer;white-space:nowrap;">
+                                <i class="bi bi-arrow-repeat"></i> {{ 'wallet.convert_btn'|trans }}
+                            </button>
+                        </form>
+                        <div style="font-size:.75rem;color:#6366f1;"><i class="bi bi-info-circle"></i> {{ 'wallet.convert_desc'|trans }}</div>
+                    {% else %}
+                        <div style="font-size:.82rem;color:#6b7280;"><i class="bi bi-info-circle"></i> {{ 'wallet.no_balance'|trans }} {{ 'wallet.convert_desc'|trans }}</div>
+                    {% endif %}
+                </div>
+
+                {# ── Discount rows in summary ────────────────────────────────── #}
+                {% if discountRate > 0 or walletDiscount > 0 %}
+                    <hr style="border-color:#efe8df">
+                    <div class="cart-summary-row">
+                        <span class="cart-summary-label">{{ 'cart.subtotal'|trans }}</span>
+                        <span style="font-weight:500;color:#64748b">{{ total|number_format(2, '.', ',') }} DT</span>
+                    </div>
+                    {% if appliedCoupon and appliedCoupon.categoryName %}
+                        <div class="cart-summary-row" style="font-size:.8rem;color:#64748b;padding-top:0;">
+                            <span><i class="bi bi-info-circle"></i> {{ 'coupon.category_base'|trans({'%cat%': appliedCoupon.categoryName, '%base%': discountBase|number_format(2, '.', ',')}) }}</span>
+                        </div>
+                    {% endif %}
+                    {% if discountRate > 0 %}
+                        <div class="cart-summary-row">
+                            <span class="cart-summary-label" style="color:#22c55e;font-weight:700;"><i class="bi bi-ticket-perforated-fill"></i> {{ 'coupon.discount_row'|trans({'%rate%': (discountRate * 100)|round}) }}</span>
+                            <span style="font-weight:700;color:#22c55e;font-size:1rem;">− {{ discountAmount|number_format(2, '.', ',') }} DT</span>
+                        </div>
+                    {% endif %}
+                    {% if walletDiscount > 0 %}
+                        <div class="cart-summary-row">
+                            <span class="cart-summary-label" style="color:#6366f1;font-weight:700;"><i class="bi bi-wallet-fill"></i> {{ 'wallet.applied_row'|trans }}</span>
+                            <span style="font-weight:700;color:#6366f1;font-size:1rem;">− {{ walletDiscount|number_format(2, '.', ',') }} DT</span>
+                        </div>
+                    {% endif %}
+                    <hr style="border-color:#efe8df">
+                    <div class="cart-summary-row">
+                        <span class="cart-summary-label" style="font-size:1.1rem;font-weight:600;color:#1e293b">{{ 'cart.total'|trans }}</span>
+                        <span class="cart-summary-total">{{ finalTotal|number_format(2, '.', ',') }} DT</span>
+                    </div>
+                {% else %}
+                    <hr style="border-color:#efe8df">
+                    <div class="cart-summary-row">
+                        <span class="cart-summary-label" style="font-size:1.1rem;font-weight:600;color:#1e293b">{{ 'cart.total'|trans }}</span>
+                        <span class="cart-summary-total">{{ total|number_format(2, '.', ',') }} DT</span>
+                    </div>
+                {% endif %}
+
+                <div class="cart-actions">
+                    <a href="{{ path('app_commande_checkout') }}" class="btn-checkout"
+                       data-confirm="{{ 'cart.checkout'|trans }}"
+                       data-confirm-title="{{ 'cart.checkout'|trans }} ?"
+                       data-confirm-icon="bi-bag-check"
+                       data-confirm-variant="info"
+                       data-confirm-btn="{{ 'cart.checkout'|trans }}">
+                        <i class="bi bi-check2-circle"></i> {{ 'cart.checkout'|trans }}
+                    </a>
+                    <a href="{{ path('app_cart_clear') }}" class="btn-clear"
+                       data-confirm="{{ 'cart.empty'|trans }}"
+                       data-confirm-title="{{ 'cart.empty'|trans }} ?"
+                       data-confirm-icon="bi-cart-x"
+                       data-confirm-variant="warning"
+                       data-confirm-btn="{{ 'cart.empty'|trans }}">
+                        <i class="bi bi-trash3"></i> {{ 'cart.remove'|trans }}
+                    </a>
+                    <a href="{{ path('app_dashboard') }}" class="btn-continue">
+                        <i class="bi bi-arrow-left"></i> {{ 'cart.continue'|trans }}
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    // Auto-dismiss flash messages
+    setTimeout(() => {
+        document.querySelectorAll('.flash-toast .alert').forEach(el => {
+            const bsAlert = bootstrap.Alert.getOrCreateInstance(el);
+            bsAlert.close();
+        });
+    }, 3000);
+
+    // Copy coupon code to clipboard
+    function copyCouponCode() {
+        const code = document.getElementById('coupon-code-display')?.textContent?.trim();
+        if (!code) return;
+        navigator.clipboard.writeText(code).then(() => {
+            const icon = document.getElementById('copy-icon');
+            if (icon) {
+                icon.className = 'bi bi-clipboard-check';
+                setTimeout(() => { icon.className = 'bi bi-clipboard'; }, 2000);
+            }
+            // Brief visual feedback on the code element
+            const el = document.getElementById('coupon-code-display');
+            if (el) {
+                const orig = el.style.background;
+                el.style.background = '#86efac';
+                setTimeout(() => { el.style.background = orig; }, 600);
+            }
+        });
+    }
+
+    // Uppercase coupon input as user types
+    document.querySelectorAll('input[name="coupon_code"]').forEach(input => {
+        input.addEventListener('input', () => { input.value = input.value.toUpperCase(); });
+    });
+</script>
+{% endblock %}

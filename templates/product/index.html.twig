@@ -1,2 +1,140 @@
-<h1>{{name}}</h1>
-<p>Welcome to the Product page!</p>
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'product.title'|trans }}{% endblock %}
+
+{% block page_title %}{{ 'product.title'|trans }}{% endblock %}
+
+{% block body %}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <p class="text-muted mb-0" style="font-size:.875rem">{{ 'product.catalog_desc'|trans }}</p>
+        <a href="{{ path('app_product_new') }}" class="btn btn-accent">
+            <i class="bi bi-plus-lg me-1"></i> {{ 'product.add'|trans }}
+        </a>
+    </div>
+
+    {# Search & Filter Bar #}
+    <div class="card mb-3">
+        <div class="card-body py-3">
+            <form method="get" action="{{ path('app_product_index') }}" class="d-flex flex-wrap gap-2 align-items-center">
+                <div class="position-relative" style="flex:1;min-width:200px">
+                    <i class="bi bi-search position-absolute" style="left:.8rem;top:50%;transform:translateY(-50%);color:#c4b5a0;font-size:.85rem"></i>
+                    <input type="text" name="q" placeholder="{{ 'product.search_placeholder'|trans }}" value="{{ currentSearch }}"
+                           class="form-control" style="padding-left:2.3rem;border:2px solid #ddd0bf;border-radius:.6rem;font-size:.85rem">
+                </div>
+                <select name="category" class="form-select" style="width:auto;border:2px solid #ddd0bf;border-radius:.6rem;font-size:.82rem;min-width:140px">
+                    <option value="">{{ 'product.category'|trans }}</option>
+                    {% for cat in categories %}
+                        <option value="{{ cat.id }}" {{ currentCategory == cat.id ? 'selected' : '' }}>{{ cat.name }}</option>
+                    {% endfor %}
+                </select>
+                <select name="supplier" class="form-select" style="width:auto;border:2px solid #ddd0bf;border-radius:.6rem;font-size:.82rem;min-width:140px">
+                    <option value="">{{ 'product.supplier'|trans }}</option>
+                    {% for sup in suppliers %}
+                        <option value="{{ sup.id }}" {{ currentSupplier == sup.id ? 'selected' : '' }}>{{ sup.nameSupp }}</option>
+                    {% endfor %}
+                </select>
+                <select name="stock" class="form-select" style="width:auto;border:2px solid #ddd0bf;border-radius:.6rem;font-size:.82rem;min-width:120px">
+                    <option value="">{{ 'product.stock'|trans }}</option>
+                    <option value="in" {{ currentStock == 'in' ? 'selected' : '' }}>{{ 'dashboard.in_stock'|trans }}</option>
+                    <option value="low" {{ currentStock == 'low' ? 'selected' : '' }}>{{ 'dashboard.low_stock_filter'|trans }}</option>
+                    <option value="out" {{ currentStock == 'out' ? 'selected' : '' }}>{{ 'dashboard.out_of_stock'|trans }}</option>
+                </select>
+                <button type="submit" class="btn btn-accent" style="padding:.45rem 1rem;font-size:.82rem">
+                    <i class="bi bi-funnel me-1"></i> {{ 'common.filter'|trans }}
+                </button>
+                {% if currentSearch or currentCategory or currentSupplier or currentStock %}
+                    <a href="{{ path('app_product_index') }}" class="btn btn-ghost" style="color:#E54A5F;font-size:.82rem" title="{{ 'common.clear'|trans }}">
+                        <i class="bi bi-x-lg"></i>
+                    </a>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span><i class="bi bi-bag me-2"></i>{{ 'product.all_products'|trans }}</span>
+            <span class="badge-count">{{ products|length }}</span>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>{{ 'product.image'|trans }}</th>
+                            <th>{{ 'product.label'|trans }}</th>
+                            <th>{{ 'product.price'|trans }}</th>
+                            <th>{{ 'product.stock'|trans }}</th>
+                            <th class="text-end">{{ 'common.actions'|trans }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for product in products %}
+                        <tr>
+                            <td><span class="text-muted">{{ product.id }}</span></td>
+                            <td>
+                                {% if product.image %}
+                                    <img src="{{ asset(product.imageFolder ~ '/' ~ product.image) }}" alt="{{ product.label }}" style="width:48px;height:48px;object-fit:cover;border-radius:.5rem;box-shadow:0 2px 8px rgba(42,54,56,.15)">
+                                {% else %}
+                                    <div style="width:48px;height:48px;border-radius:.5rem;background:linear-gradient(135deg,#f5f0ea,#efe8df);display:grid;place-items:center;color:#2A3638;font-size:1.1rem">
+                                        <i class="bi bi-image"></i>
+                                    </div>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <strong>{{ product.label }}</strong>
+                                {% if product.isAlternative %}
+                                    <div style="font-size:.65rem;margin-top:.15rem">
+                                        <span style="background:linear-gradient(135deg,#dde8de,#c8deca);color:#2A3638;font-weight:700;padding:.1rem .4rem;border-radius:999px;font-size:.58rem">
+                                            <i class="bi bi-arrow-repeat"></i> {{ 'product.alt_badge'|trans }}
+                                        </span>
+                                        {% if product.alternativeFor %}
+                                            <span style="color:#94a3b8;margin-left:.2rem">{{ 'product.alt_of'|trans }} {{ product.alternativeFor }}</span>
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+                            </td>
+                            <td>{{ product.price is not null ? (product.price|number_format(2, '.', ',') ~ ' ') : '— ' }}<small class="text-muted">{{ product.price is not null ? 'DT' : '' }}</small></td>
+                            <td>
+                                {% if product.quantity <= 0 %}
+                                    <span class="badge" style="background:#f9d4d8;color:#E54A5F;font-weight:700">{{ 'dashboard.out_of_stock'|trans }}</span>
+                                {% elseif product.quantity <= 5 %}
+                                    <span class="badge" style="background:#fef3c7;color:#92400e;font-weight:700">{{ product.quantity }}</span>
+                                {% else %}
+                                    <span class="badge" style="background:#dde8de;color:#065f46;font-weight:700">{{ product.quantity }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end">
+                                <a href="{{ path('app_product_show', {'id': product.id}) }}" class="btn btn-ghost" title="{{ 'common.show'|trans }}"><i class="bi bi-eye"></i></a>
+                                <a href="{{ path('app_product_edit', {'id': product.id}) }}" class="btn btn-ghost" title="{{ 'common.edit'|trans }}"><i class="bi bi-pencil"></i></a>
+                                {% if is_granted('ROLE_ADMIN') %}
+                                    <form method="post" action="{{ path('app_product_delete', {'id': product.id}) }}"
+                                          data-confirm="{{ 'product.confirm_delete_msg'|trans({'%name%': product.label}) }}"
+                                          data-confirm-title="{{ 'product.confirm_delete_title'|trans }}"
+                                          data-confirm-icon="bi-trash3"
+                                          data-confirm-variant="danger"
+                                          data-confirm-btn="{{ 'common.delete'|trans }}"
+                                          style="display:inline">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ product.id) }}">
+                                        <button type="submit" class="btn btn-ghost" title="{{ 'common.delete'|trans }}" style="color:#E54A5F">
+                                            <i class="bi bi-trash3"></i>
+                                        </button>
+                                    </form>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center py-5 text-muted">
+                                <i class="bi bi-inbox" style="font-size:2rem"></i>
+                                <p class="mt-2 mb-0">{{ 'product.no_products'|trans }}</p>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

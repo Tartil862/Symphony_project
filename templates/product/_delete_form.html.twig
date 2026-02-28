@@ -1,0 +1,10 @@
+<form method="post" action="{{ path('app_product_delete', {'id': product.id}) }}"
+      data-confirm="{{ 'product.confirm_delete_msg'|trans({'%name%': product.label}) }}"
+      data-confirm-title="{{ 'product.confirm_delete_title'|trans }}"
+      data-confirm-icon="bi-trash3"
+      data-confirm-variant="danger"
+      data-confirm-btn="{{ 'common.delete'|trans }}"
+      style="display:inline">
+    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ product.id) }}">
+    <button class="btn btn-danger-soft"><i class="bi bi-trash me-1"></i>{{ 'product.delete'|trans }}</button>
+</form>

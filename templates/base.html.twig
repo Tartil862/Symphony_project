@@ -1,1 +1,1364 @@
 <!DOCTYPE html>
+<html lang="{{ app.request.locale }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ 'brand.name'|trans }}{% endblock %}</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon.svg">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.svg">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon.svg">
+    <link rel="manifest" href="/site.webmanifest">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    {# Apply saved theme immediately to prevent FOUC #}
+    <script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
+    <style>
+        :root {
+            --sidebar-width: 270px;
+            --accent: #91B893;
+            --accent-hover: #7aa67c;
+            --accent-light: rgba(145,184,147,.12);
+            --success: #91B893;
+            --warning: #F1947C;
+            --danger: #E54A5F;
+            --info: #E5C6A4;
+            --body-bg: #FAF6F1;
+            --card-bg: #ffffff;
+            --card-shadow: 0 2px 8px rgba(42,54,56,.06), 0 0 1px rgba(42,54,56,.06);
+            --transition-speed: .3s;
+            --transition-bounce: cubic-bezier(.34,1.56,.64,1);
+            --green: #91B893;
+            --sand: #E5C6A4;
+            --coral: #F1947C;
+            --red: #E54A5F;
+            --dark: #2A3638;
+            /* Semantic tokens */
+            --topbar-bg: rgba(255,255,255,.85);
+            --topbar-border: rgba(226,232,240,.6);
+            --topbar-text: #2A3638;
+            --text-primary: #2A3638;
+            --text-secondary: #334155;
+            --text-muted: #64748b;
+            --border-color: #ecdcc8;
+            --border-input: #ddd0bf;
+            --border-table: #f1f5f9;
+            --input-bg: #ffffff;
+            --input-text: #1e293b;
+            --table-head-bg: linear-gradient(135deg, #f5f0eb, #f0e7db);
+            --table-head-color: #2A3638;
+            --table-head-border: #E5C6A4;
+            --table-row-hover: linear-gradient(135deg, #faf6f1, #f0e7db);
+            --table-td-color: #334155;
+            --card-header-bg: linear-gradient(135deg, #fefefe, #faf6f1);
+            --card-header-color: #2A3638;
+            --card-header-border: #ecdcc8;
+            --detail-th-bg: linear-gradient(135deg, #f5f0eb, #f0e7db);
+            --detail-th-color: #2A3638;
+            --detail-td-color: #1e293b;
+            --detail-row-hover: #faf6f1;
+            --notif-dropdown-bg: #ffffff;
+            --notif-header-bg: linear-gradient(135deg, #faf6f1, #f0e7db);
+            --notif-header-color: #2A3638;
+            --notif-item-hover: #faf6f1;
+            --notif-item-unread-bg: linear-gradient(135deg, #faf6f1, #f0e7db);
+            --notif-item-border: #f8fafc;
+            --notif-msg-color: #334155;
+            --notif-footer-border: #f1f5f9;
+            --notif-footer-color: #2A3638;
+            --confirm-box-bg: #ffffff;
+            --confirm-cancel-bg: #f8fafc;
+            --confirm-cancel-color: #64748b;
+            --confirm-cancel-hover: #f1f5f9;
+            --badge-count-bg: linear-gradient(135deg, #dbe8dc, #c8deca);
+            --badge-count-color: #2A3638;
+            --btn-ghost-hover-bg: linear-gradient(135deg, #f0e7db, #faf6f1);
+            --btn-ghost-hover-color: #1f2c2e;
+            --label-color: #2A3638;
+            --date-badge-bg: linear-gradient(135deg, #f0e7db, #E5C6A4);
+            --date-badge-color: #2A3638;
+        }
+
+        /* ── Dark theme ─────────────────────────────── */
+        html[data-theme="dark"] {
+            --body-bg: #0d1117;
+            --card-bg: #161b22;
+            --card-shadow: 0 2px 8px rgba(0,0,0,.4), 0 0 1px rgba(0,0,0,.25);
+            --topbar-bg: rgba(13,17,23,.97);
+            --topbar-border: rgba(48,54,61,.8);
+            --topbar-text: #c9d1d9;
+            --text-primary: #c9d1d9;
+            --text-secondary: #8b949e;
+            --text-muted: #6e7681;
+            --border-color: #30363d;
+            --border-input: #30363d;
+            --border-table: #21262d;
+            --input-bg: #0d1117;
+            --input-text: #c9d1d9;
+            --table-head-bg: linear-gradient(135deg, #1c2329, #1e2a30);
+            --table-head-color: #8b949e;
+            --table-head-border: #30363d;
+            --table-row-hover: linear-gradient(135deg, #1e2a30, #1c2329);
+            --table-td-color: #c9d1d9;
+            --card-header-bg: linear-gradient(135deg, #1c2329, #161b22);
+            --card-header-color: #c9d1d9;
+            --card-header-border: #30363d;
+            --detail-th-bg: linear-gradient(135deg, #1c2329, #1e2a30);
+            --detail-th-color: #8b949e;
+            --detail-td-color: #c9d1d9;
+            --detail-row-hover: #1e2a30;
+            --notif-dropdown-bg: #161b22;
+            --notif-header-bg: linear-gradient(135deg, #1c2329, #161b22);
+            --notif-header-color: #c9d1d9;
+            --notif-item-hover: #1e2a30;
+            --notif-item-unread-bg: #1c2329;
+            --notif-item-border: #21262d;
+            --notif-msg-color: #c9d1d9;
+            --notif-footer-border: #21262d;
+            --notif-footer-color: #8b949e;
+            --confirm-box-bg: #161b22;
+            --confirm-cancel-bg: #1c2329;
+            --confirm-cancel-color: #8b949e;
+            --confirm-cancel-hover: #1e2a30;
+            --badge-count-bg: linear-gradient(135deg, #1c3a1e, #1a3320);
+            --badge-count-color: #91B893;
+            --btn-ghost-hover-bg: #1e2a30;
+            --btn-ghost-hover-color: #c9d1d9;
+            --label-color: #8b949e;
+            --date-badge-bg: linear-gradient(135deg, #1c2329, #1e2a30);
+            --date-badge-color: #8b949e;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--body-bg);
+            margin: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ── Sidebar ────────────────────────────────── */
+        .sidebar {
+            position: fixed;
+            top: 0; left: 0; bottom: 0;
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, #1f2c2e 0%, #2A3638 40%, #354345 100%);
+            color: #c7d8c8;
+            display: flex;
+            flex-direction: column;
+            z-index: 1040;
+            transition: transform .4s cubic-bezier(.4,0,.2,1);
+            box-shadow: 4px 0 24px rgba(42,54,56,.2);
+        }
+
+        .sidebar-brand {
+            padding: 1.6rem 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: .85rem;
+            border-bottom: 1px solid rgba(255,255,255,.1);
+        }
+        .sidebar-brand .logo-icon {
+            width: 42px; height: 42px;
+            background: linear-gradient(135deg, #E54A5F 0%, #F1947C 50%, #91B893 100%);
+            border-radius: .75rem;
+            display: grid; place-items: center;
+            color: #fff; font-size: 1.2rem;
+            box-shadow: 0 4px 15px rgba(229,74,95,.35);
+            transition: transform .4s var(--transition-bounce);
+        }
+        .sidebar-brand:hover .logo-icon {
+            transform: rotate(-8deg) scale(1.1);
+        }
+        .sidebar-brand span {
+            font-weight: 700; font-size: 1.2rem;
+            background: linear-gradient(135deg, #F1947C, #E5C6A4, #91B893);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -.02em;
+        }
+
+        .sidebar-nav { flex: 1; padding: 1.2rem 0; overflow-y: auto; }
+        .sidebar-nav .nav-section {
+            padding: .65rem 1.3rem .4rem;
+            font-size: .65rem; font-weight: 600;
+            text-transform: uppercase; letter-spacing: .1em;
+            color: #91B893;
+        }
+        .sidebar-nav a {
+            display: flex; align-items: center; gap: .75rem;
+            padding: .7rem 1.2rem;
+            color: #b0c8b2;
+            text-decoration: none;
+            font-size: .875rem; font-weight: 500;
+            border-radius: .65rem;
+            margin: 3px .85rem;
+            transition: all .35s cubic-bezier(.4,0,.2,1);
+            position: relative;
+            overflow: hidden;
+        }
+        .sidebar-nav a::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: linear-gradient(135deg, rgba(229,74,95,.12), rgba(145,184,147,.12));
+            opacity: 0;
+            transition: opacity .35s ease;
+            border-radius: .65rem;
+        }
+        .sidebar-nav a:hover::before { opacity: 1; }
+        .sidebar-nav a:hover {
+            color: #e8f0e9;
+            transform: translateX(4px);
+        }
+        .sidebar-nav a.active {
+            background: linear-gradient(135deg, #E54A5F, #F1947C);
+            color: #fff;
+            box-shadow: 0 4px 18px rgba(229,74,95,.4);
+            transform: scale(1.02);
+        }
+        .sidebar-nav a.active::before { opacity: 0; }
+        .sidebar-nav a i {
+            font-size: 1.15rem; width: 1.4rem; text-align: center;
+            transition: transform .3s var(--transition-bounce);
+        }
+        .sidebar-nav a:hover i { transform: scale(1.2); }
+
+        .sidebar-footer {
+            padding: 1.2rem 1.3rem;
+            border-top: 1px solid rgba(255,255,255,.08);
+            display: flex; align-items: center; gap: .6rem;
+            font-size: .78rem; color: #91B893;
+        }
+        .sidebar-footer .pulse-dot {
+            width: 8px; height: 8px;
+            background: #91B893; border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: .5; transform: scale(1.4); }
+        }
+
+        /* ── Main content ───────────────────────────── */
+        .main-wrapper {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+            transition: margin-left .4s cubic-bezier(.4,0,.2,1);
+        }
+
+        .topbar {
+            height: 68px;
+            background: var(--topbar-bg);
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--topbar-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            position: sticky; top: 0; z-index: 1030;
+        }
+        .topbar h1 {
+            font-size: 1.15rem; font-weight: 700; margin: 0;
+            color: var(--topbar-text);
+            background: none;
+            -webkit-text-fill-color: var(--topbar-text);
+        }
+        .topbar .date-badge {
+            background: var(--date-badge-bg);
+            color: var(--date-badge-color);
+            font-size: .8rem; font-weight: 600;
+            padding: .4rem .85rem;
+            border-radius: 999px;
+            display: flex; align-items: center; gap: .4rem;
+        }
+
+        .content-area {
+            padding: 2rem;
+            animation: fadeSlideUp .5s cubic-bezier(.4,0,.2,1);
+        }
+
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(20px) scale(.98); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* ── Cards ──────────────────────────────────── */
+        .card {
+            border: none;
+            border-radius: 1rem;
+            box-shadow: var(--card-shadow);
+            transition: all .4s cubic-bezier(.4,0,.2,1);
+            overflow: hidden;
+            background: var(--card-bg);
+        }
+        .card:hover {
+            box-shadow: 0 8px 30px rgba(145,184,147,.15), 0 2px 8px rgba(0,0,0,.06);
+            transform: translateY(-2px);
+        }
+        .card-header {
+            background: var(--card-header-bg);
+            border-bottom: 1px solid var(--card-header-border);
+            padding: 1.2rem 1.5rem;
+            font-weight: 600; font-size: 1rem;
+            border-radius: 1rem 1rem 0 0 !important;
+            color: var(--card-header-color);
+        }
+
+        /* ── Table ──────────────────────────────────── */
+        .table { margin-bottom: 0; }
+        .table thead th {
+            background: var(--table-head-bg);
+            color: var(--table-head-color);
+            font-size: .72rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: .06em;
+            border-bottom: 2px solid var(--table-head-border);
+            padding: .9rem 1rem;
+        }
+        .table tbody td {
+            padding: .9rem 1rem;
+            vertical-align: middle;
+            color: var(--table-td-color);
+            border-bottom: 1px solid var(--border-table);
+            transition: all .3s ease;
+        }
+        .table tbody tr {
+            transition: all .3s cubic-bezier(.4,0,.2,1);
+        }
+        .table tbody tr:hover {
+            background: var(--table-row-hover);
+            transform: scale(1.005);
+        }
+
+        /* ── Buttons ────────────────────────────────── */
+        .btn-accent {
+            background: linear-gradient(135deg, #7aa67c, #91B893, #a8caa9);
+            color: #fff; border: none;
+            padding: .55rem 1.4rem;
+            border-radius: .6rem;
+            font-weight: 600; font-size: .875rem;
+            transition: all .35s cubic-bezier(.4,0,.2,1);
+            box-shadow: 0 4px 15px rgba(145,184,147,.3);
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-accent::after {
+            content: '';
+            position: absolute; inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,.2), transparent);
+            opacity: 0;
+            transition: opacity .3s ease;
+        }
+        .btn-accent:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(145,184,147,.45);
+            color: #fff;
+        }
+        .btn-accent:hover::after { opacity: 1; }
+        .btn-accent:active { transform: translateY(0) scale(.98); }
+
+        .btn-outline-accent {
+            border: 2px solid #91B893;
+            color: #91B893;
+            background: transparent;
+            padding: .45rem 1.1rem;
+            border-radius: .6rem;
+            font-weight: 600; font-size: .8rem;
+            transition: all .35s cubic-bezier(.4,0,.2,1);
+        }
+        .btn-outline-accent:hover {
+            background: linear-gradient(135deg, #7aa67c, #91B893);
+            color: #fff;
+            border-color: transparent;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(145,184,147,.3);
+        }
+
+        .btn-danger-soft {
+            background: linear-gradient(135deg, #fce8eb, #f9d0d6);
+            color: #E54A5F; border: none;
+            padding: .45rem 1.1rem; border-radius: .6rem;
+            font-weight: 600; font-size: .8rem;
+            transition: all .35s cubic-bezier(.4,0,.2,1);
+        }
+        .btn-danger-soft:hover {
+            background: linear-gradient(135deg, #E54A5F, #c93d4f);
+            color: #fff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(229,74,95,.35);
+        }
+
+        .btn-ghost {
+            background: transparent; color: var(--text-primary); border: none;
+            padding: .45rem .8rem; border-radius: .5rem;
+            font-size: .9rem;
+            transition: all .3s cubic-bezier(.4,0,.2,1);
+        }
+        .btn-ghost:hover {
+            background: var(--btn-ghost-hover-bg);
+            color: var(--btn-ghost-hover-color);
+            transform: scale(1.15);
+        }
+        .btn-ghost:active { transform: scale(.95); }
+
+        /* ── Detail table ───────────────────────────── */
+        .detail-table th {
+            width: 180px;
+            color: var(--detail-th-color);
+            font-weight: 600;
+            font-size: .82rem;
+            background: var(--detail-th-bg);
+            border: none;
+            padding: 1rem 1.25rem;
+        }
+        .detail-table td {
+            border: none;
+            padding: 1rem 1.25rem;
+            color: var(--detail-td-color);
+            font-weight: 500;
+        }
+        .detail-table tr {
+            transition: background .3s ease;
+        }
+        .detail-table tr:hover {
+            background: var(--detail-row-hover);
+        }
+
+        /* ── Forms ──────────────────────────────────── */
+        .form-control, .form-select {
+            border-radius: .6rem;
+            border: 2px solid var(--border-input);
+            padding: .65rem 1rem;
+            transition: all .35s cubic-bezier(.4,0,.2,1);
+            font-size: .9rem;
+            background-color: var(--input-bg);
+            color: var(--input-text);
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #91B893;
+            box-shadow: 0 0 0 4px rgba(145,184,147,.15);
+            transform: scale(1.01);
+            background-color: var(--input-bg);
+            color: var(--input-text);
+        }
+        label {
+            font-weight: 600; color: var(--label-color);
+            font-size: .85rem; margin-bottom: .4rem;
+        }
+
+        /* ── Badge ──────────────────────────────────── */
+        .badge-count {
+            background: var(--badge-count-bg);
+            color: var(--badge-count-color);
+            font-weight: 700; font-size: .75rem;
+            padding: .25em .65em; border-radius: 999px;
+            transition: transform .3s var(--transition-bounce);
+        }
+        .badge-count:hover { transform: scale(1.15); }
+
+        /* ── Scrollbar ──────────────────────────────── */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb {
+            background: #c8deca; border-radius: 999px;
+        }
+        ::-webkit-scrollbar-thumb:hover { background: #91B893; }
+
+        /* ── Notification Dropdown ──────────────────── */
+        .notif-wrapper {
+            position: relative;
+        }
+        .notif-btn {
+            position: relative;
+            background: none; border: none;
+            color: var(--text-primary); font-size: 1.3rem;
+            cursor: pointer;
+            transition: all .3s var(--transition-bounce);
+            padding: .3rem;
+        }
+        .notif-btn:hover { transform: scale(1.15); color: #E54A5F; }
+        .notif-badge {
+            position: absolute; top: -4px; right: -6px;
+            background: linear-gradient(135deg, #E54A5F, #c93d4f);
+            color: #fff; font-size: .55rem; font-weight: 800;
+            min-width: 17px; height: 17px;
+            border-radius: 50%; display: grid; place-items: center;
+            box-shadow: 0 2px 8px rgba(229,74,95,.4);
+            animation: pulse 2s ease-in-out infinite;
+        }
+        .notif-dropdown {
+            position: absolute; top: calc(100% + 10px); right: -10px;
+            width: 360px;
+            background: var(--notif-dropdown-bg);
+            border-radius: 1rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,.25), 0 1px 3px rgba(0,0,0,.12);
+            z-index: 1050;
+            display: none;
+            overflow: hidden;
+            animation: notifSlideDown .25s cubic-bezier(.4,0,.2,1);
+            border: 1px solid var(--border-color);
+        }
+        .notif-dropdown.show { display: block; }
+        @keyframes notifSlideDown {
+            from { opacity: 0; transform: translateY(-8px) scale(.96); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .notif-dropdown-header {
+            padding: .85rem 1.1rem;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--notif-header-bg);
+        }
+        .notif-dropdown-header h6 {
+            margin: 0; font-weight: 700; font-size: .9rem; color: var(--notif-header-color);
+        }
+        .notif-dropdown-body {
+            max-height: 340px; overflow-y: auto;
+        }
+        .notif-item {
+            display: flex; gap: .75rem; padding: .85rem 1.1rem;
+            border-bottom: 1px solid var(--notif-item-border);
+            transition: background .2s ease;
+            text-decoration: none; color: inherit;
+            cursor: pointer;
+        }
+        .notif-item:hover { background: var(--notif-item-hover); }
+        .notif-item.unread { background: var(--notif-item-unread-bg); }
+        .notif-item-icon {
+            width: 36px; height: 36px;
+            border-radius: .6rem; display: grid; place-items: center;
+            font-size: .9rem; color: #fff; flex-shrink: 0;
+        }
+        .notif-item-content { flex: 1; min-width: 0; }
+        .notif-item-msg {
+            font-size: .82rem; font-weight: 500; color: var(--notif-msg-color);
+            line-height: 1.35;
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .notif-item.unread .notif-item-msg { font-weight: 600; color: var(--text-primary); }
+        .notif-item-time {
+            font-size: .68rem; color: #94a3b8; margin-top: .2rem;
+        }
+        .notif-dropdown-footer {
+            padding: .7rem; text-align: center;
+            border-top: 1px solid var(--notif-footer-border);
+        }
+        .notif-dropdown-footer a {
+            font-size: .8rem; font-weight: 600; color: var(--notif-footer-color);
+            text-decoration: none; transition: color .2s;
+        }
+        .notif-dropdown-footer a:hover { color: #E54A5F; }
+        .notif-empty {
+            text-align: center; padding: 2rem 1rem; color: #94a3b8;
+        }
+        .notif-empty i { font-size: 2rem; margin-bottom: .5rem; display: block; }
+
+        /* ── Confirmation Modal ──────────────────────── */
+        .confirm-overlay {
+            position: fixed; inset: 0;
+            background: rgba(42,54,56,.5);
+            backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+            z-index: 1060;
+            display: none;
+            place-items: center;
+            animation: confirmOverlayIn .2s ease;
+        }
+        .confirm-overlay.show { display: grid; }
+        @keyframes confirmOverlayIn {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+        .confirm-box {
+            background: var(--confirm-box-bg);
+            border-radius: 1.2rem;
+            box-shadow: 0 25px 80px rgba(0,0,0,.35), 0 8px 20px rgba(0,0,0,.15);
+            width: 400px; max-width: 92vw;
+            overflow: hidden;
+            animation: confirmBoxIn .3s cubic-bezier(.34,1.56,.64,1);
+            border: 1px solid var(--border-color);
+        }
+        @keyframes confirmBoxIn {
+            from { opacity: 0; transform: scale(.85) translateY(20px); }
+            to   { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .confirm-icon-area {
+            padding: 1.8rem 1.5rem 1rem;
+            text-align: center;
+        }
+        .confirm-icon-circle {
+            width: 64px; height: 64px;
+            border-radius: 50%;
+            display: inline-grid; place-items: center;
+            font-size: 1.6rem;
+            margin-bottom: .3rem;
+        }
+        .confirm-icon-circle.danger {
+            background: linear-gradient(135deg, #fce8eb, #f9d0d6);
+            color: #E54A5F;
+        }
+        .confirm-icon-circle.warning {
+            background: linear-gradient(135deg, #fce8e3, #f9d5cc);
+            color: #F1947C;
+        }
+        .confirm-icon-circle.info {
+            background: linear-gradient(135deg, #dbe8dc, #c8deca);
+            color: #91B893;
+        }
+        .confirm-body {
+            padding: 0 1.8rem 1.2rem;
+            text-align: center;
+        }
+        .confirm-title {
+            font-size: 1.05rem; font-weight: 700;
+            color: var(--text-primary); margin-bottom: .4rem;
+        }
+        .confirm-message {
+            font-size: .85rem; color: var(--text-secondary);
+            line-height: 1.5;
+        }
+        .confirm-actions {
+            display: flex; gap: 0;
+            border-top: 1px solid var(--border-color);
+        }
+        .confirm-actions button {
+            flex: 1; padding: .85rem;
+            border: none; font-size: .88rem; font-weight: 600;
+            cursor: pointer; transition: all .2s ease;
+        }
+        .confirm-btn-cancel {
+            background: var(--confirm-cancel-bg); color: var(--confirm-cancel-color);
+            border-radius: 0 0 0 1.2rem;
+        }
+        .confirm-btn-cancel:hover { background: var(--confirm-cancel-hover); color: var(--text-secondary); }
+        .confirm-btn-confirm {
+            border-radius: 0 0 1.2rem 0;
+        }
+        .confirm-btn-confirm.danger {
+            background: linear-gradient(135deg, #E54A5F, #c93d4f);
+            color: #fff;
+        }
+        .confirm-btn-confirm.danger:hover {
+            background: linear-gradient(135deg, #c93d4f, #a83040);
+            box-shadow: 0 4px 12px rgba(229,74,95,.3);
+        }
+        .confirm-btn-confirm.warning {
+            background: linear-gradient(135deg, #F1947C, #e07c62);
+            color: #fff;
+        }
+        .confirm-btn-confirm.warning:hover {
+            background: linear-gradient(135deg, #e07c62, #d06a50);
+            box-shadow: 0 4px 12px rgba(241,148,124,.3);
+        }
+        .confirm-btn-confirm.info {
+            background: linear-gradient(135deg, #91B893, #7aa67c);
+            color: #fff;
+        }
+        .confirm-btn-confirm.info:hover {
+            background: linear-gradient(135deg, #7aa67c, #639465);
+            box-shadow: 0 4px 12px rgba(145,184,147,.3);
+        }
+
+        /* ── Responsive ─────────────────────────────── */
+        .sidebar-toggler {
+            display: none;
+            background: none; border: none;
+            font-size: 1.5rem; color: var(--text-primary); cursor: pointer;
+            transition: transform .3s var(--transition-bounce);
+        }
+        .sidebar-toggler:hover { transform: rotate(90deg); }
+        @media (max-width: 991.98px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.show { transform: translateX(0); }
+            .main-wrapper { margin-left: 0; }
+            .sidebar-toggler { display: inline-flex; }
+            .sidebar-backdrop {
+                position: fixed; inset: 0;
+                background: rgba(42,54,56,.5);
+                backdrop-filter: blur(4px);
+                z-index: 1035;
+                display: none;
+            }
+            .sidebar-backdrop.show { display: block; }
+        }
+        /* ── Topbar semantic classes ────────────────────── */
+        .topbar-user-section {
+            padding-left: .5rem;
+            border-left: 1px solid var(--border-input);
+        }
+        .topbar-username {
+            font-size: .82rem; font-weight: 500;
+            color: var(--text-primary);
+        }
+        .topbar-login-btn {
+            background: transparent;
+            border: 2px solid var(--text-primary);
+            color: var(--text-primary);
+            padding: .3rem .9rem; border-radius: .6rem;
+            font-size: .8rem; font-weight: 600;
+            text-decoration: none;
+            display: flex; align-items: center; gap: .4rem;
+            transition: all .25s ease;
+        }
+        .topbar-login-btn:hover {
+            background: var(--text-primary);
+            color: var(--body-bg);
+        }
+        .topbar-locale-btn {
+            font-size: .72rem; font-weight: 400;
+            color: #94a3b8;
+            text-decoration: none;
+            padding: .15rem .35rem; border-radius: .3rem;
+            border: 1px solid transparent;
+            transition: all .2s;
+        }
+        .topbar-locale-btn.active {
+            font-weight: 700;
+            color: var(--text-primary);
+            border-color: var(--border-input);
+        }
+
+    </style>
+    {% block stylesheets %}{% endblock %}
+
+    {# ── DARK MODE OVERRIDES (placed AFTER block stylesheets so they win) ── #}
+    <style>
+        /* ══════════════════════════════════════════════════════════════
+           COMPLETE DARK MODE — covers base, all child pages, inline styles
+           ══════════════════════════════════════════════════════════════ */
+
+        /* ── SIDEBAR dark mode ─────────────────────── */
+        html[data-theme="dark"] .sidebar {
+            background: linear-gradient(180deg, #0d1117 0%, #161b22 40%, #1c2329 100%) !important;
+            box-shadow: 4px 0 24px rgba(0,0,0,.5) !important;
+        }
+        html[data-theme="dark"] .sidebar-brand {
+            border-bottom-color: rgba(48,54,61,.6) !important;
+        }
+        html[data-theme="dark"] .sidebar-nav .nav-section { color: #8b949e !important; }
+        html[data-theme="dark"] .sidebar-nav a { color: #8b949e !important; }
+        html[data-theme="dark"] .sidebar-nav a:hover { color: #c9d1d9 !important; }
+        html[data-theme="dark"] .sidebar-nav a.active { color: #fff !important; }
+        html[data-theme="dark"] .sidebar-footer {
+            border-top-color: rgba(48,54,61,.6) !important;
+            color: #8b949e !important;
+        }
+        html[data-theme="dark"] .sidebar-footer .pulse-dot { background: #8b949e !important; }
+
+        /* ── Body / layout ──────────────────────────── */
+        html[data-theme="dark"] body,
+        html[data-theme="dark"] .main-wrapper,
+        html[data-theme="dark"] .content-area { color: #c9d1d9 !important; }
+        html[data-theme="dark"] .card-body { background: #161b22 !important; color: #c9d1d9 !important; }
+        html[data-theme="dark"] .sidebar-backdrop { background: rgba(0,0,0,.7) !important; }
+        html[data-theme="dark"] hr { border-color: #30363d !important; }
+
+        /* ── CSS attribute selectors — catch ALL inline styles ─────── */
+        /* These target elements with matching style="" attributes directly */
+        html[data-theme="dark"] [style*="background: #fff"],
+        html[data-theme="dark"] [style*="background:#fff"],
+        html[data-theme="dark"] [style*="background: white"],
+        html[data-theme="dark"] [style*="background: #FAF6F1"],
+        html[data-theme="dark"] [style*="background:#FAF6F1"],
+        html[data-theme="dark"] [style*="background: #faf6f1"],
+        html[data-theme="dark"] [style*="background: #faf7f3"],
+        html[data-theme="dark"] [style*="background: #fdfbf8"],
+        html[data-theme="dark"] [style*="background: #f5f0ea"],
+        html[data-theme="dark"] [style*="background: #fef2f2"],
+        html[data-theme="dark"] [style*="background: #fffbeb"],
+        html[data-theme="dark"] [style*="background: #fff5f5"],
+        html[data-theme="dark"] [style*="background: #f8fafc"],
+        html[data-theme="dark"] [style*="background: #f0faf0"],
+        html[data-theme="dark"] [style*="background: #f7faf7"],
+        html[data-theme="dark"] [style*="background: #f8f9fa"] { background: #161b22 !important; }
+
+        html[data-theme="dark"] [style*="color: #2A3638"],
+        html[data-theme="dark"] [style*="color:#2A3638"],
+        html[data-theme="dark"] [style*="color: #1e293b"],
+        html[data-theme="dark"] [style*="color:#1e293b"],
+        html[data-theme="dark"] [style*="color: #334155"],
+        html[data-theme="dark"] [style*="color:#334155"],
+        html[data-theme="dark"] [style*="color: #475569"],
+        html[data-theme="dark"] [style*="color:#475569"],
+        html[data-theme="dark"] [style*="color: #374151"],
+        html[data-theme="dark"] [style*="color:#374151"] { color: #c9d1d9 !important; }
+
+        html[data-theme="dark"] [style*="color: #64748b"],
+        html[data-theme="dark"] [style*="color:#64748b"],
+        html[data-theme="dark"] [style*="color: #94a3b8"],
+        html[data-theme="dark"] [style*="color:#94a3b8"],
+        html[data-theme="dark"] [style*="color: #6b7280"],
+        html[data-theme="dark"] [style*="color:#6b7280"] { color: #8b949e !important; }
+
+        html[data-theme="dark"] [style*="border-color: #efe8df"],
+        html[data-theme="dark"] [style*="border-color:#efe8df"],
+        html[data-theme="dark"] [style*="border-color: #f1f5f9"],
+        html[data-theme="dark"] [style*="border-color:#f1f5f9"] { border-color: #30363d !important; }
+
+        /* ── Bootstrap utilities ────────────────────── */
+        html[data-theme="dark"] .table {
+            --bs-table-bg: transparent !important;
+            --bs-table-color: #c9d1d9 !important;
+            --bs-table-border-color: #21262d !important;
+        }
+        html[data-theme="dark"] .form-control::placeholder { color: #6e7681 !important; }
+        html[data-theme="dark"] .form-select option { background: #161b22 !important; color: #c9d1d9 !important; }
+        html[data-theme="dark"] .btn-danger-soft { background: #2d1a1e !important; color: #E54A5F !important; }
+        html[data-theme="dark"] .text-muted { color: #6e7681 !important; }
+        html[data-theme="dark"] .text-secondary { color: #8b949e !important; }
+        html[data-theme="dark"] .text-dark { color: #c9d1d9 !important; }
+        html[data-theme="dark"] .border { border-color: #30363d !important; }
+        html[data-theme="dark"] .border-top,
+        html[data-theme="dark"] .border-bottom { border-color: #30363d !important; }
+        html[data-theme="dark"] .bg-white,
+        html[data-theme="dark"] .bg-light { background-color: #161b22 !important; }
+        html[data-theme="dark"] .list-group-item { background: #161b22 !important; color: #c9d1d9 !important; border-color: #30363d !important; }
+        html[data-theme="dark"] .dropdown-menu { background: #161b22 !important; border-color: #30363d !important; }
+        html[data-theme="dark"] .dropdown-item { color: #c9d1d9 !important; }
+        html[data-theme="dark"] .dropdown-item:hover { background: #1c2329 !important; }
+        html[data-theme="dark"] .modal-content { background: #161b22 !important; color: #c9d1d9 !important; border-color: #30363d !important; }
+        html[data-theme="dark"] .modal-header,
+        html[data-theme="dark"] .modal-footer { border-color: #30363d !important; }
+
+        /* ── Alerts ─────────────────────────────────── */
+        html[data-theme="dark"] .alert-success { background:#1c3a1e !important; border-color:#2d5a30 !important; color:#a7c5a8 !important; }
+        html[data-theme="dark"] .alert-warning { background:#3a2a1c !important; border-color:#5a3e2d !important; color:#c5a07a !important; }
+        html[data-theme="dark"] .alert-info    { background:#1c293a !important; border-color:#2d3f5a !important; color:#7aa0c5 !important; }
+        html[data-theme="dark"] .alert-danger  { background:#3a1c20 !important; border-color:#5a2d32 !important; color:#c57a80 !important; }
+        html[data-theme="dark"] .alert .btn-close { filter: invert(1) !important; }
+        html[data-theme="dark"] .flash-toast .alert { box-shadow:0 8px 25px rgba(0,0,0,.5) !important; }
+
+        /* ── All white/light background card/container classes ─────── */
+        html[data-theme="dark"] .product-card,
+        html[data-theme="dark"] .boycott-card,
+        html[data-theme="dark"] .boycott-detail-card,
+        html[data-theme="dark"] .alt-table-wrapper,
+        html[data-theme="dark"] .ligne-card,
+        html[data-theme="dark"] .commande-card,
+        html[data-theme="dark"] .podium-item,
+        html[data-theme="dark"] .stat-card,
+        html[data-theme="dark"] .search-filter-bar,
+        html[data-theme="dark"] .boycott-filter-bar,
+        html[data-theme="dark"] .boycott-stat,
+        html[data-theme="dark"] .order-card,
+        html[data-theme="dark"] .pending-card,
+        html[data-theme="dark"] .alt-card,
+        html[data-theme="dark"] .detail-card,
+        html[data-theme="dark"] .show-alt-card,
+        html[data-theme="dark"] .show-alt-wrapper,
+        html[data-theme="dark"] .cart-section,
+        html[data-theme="dark"] .cart-summary-card,
+        html[data-theme="dark"] .boycott-detail-body { background: #161b22 !important; }
+
+        html[data-theme="dark"] .meta-item,
+        html[data-theme="dark"] .alt-img-placeholder,
+        html[data-theme="dark"] .alt-vote-btn,
+        html[data-theme="dark"] .stock-input,
+        html[data-theme="dark"] .notif-stat,
+        html[data-theme="dark"] .filter-select,
+        html[data-theme="dark"] .btn-clear-filter,
+        html[data-theme="dark"] .btn-delete-admin { background: #1c2329 !important; color: #c9d1d9 !important; border-color: #30363d !important; }
+
+        /* ── Table rows hover ───────────────────────── */
+        html[data-theme="dark"] .alt-table tbody tr:hover { background: #1e2a30 !important; }
+        html[data-theme="dark"] .alt-table tbody td { color: #c9d1d9 !important; border-color: #21262d !important; }
+        html[data-theme="dark"] .alt-table thead th { background: #1c2329 !important; color: #8b949e !important; }
+
+        /* ── Order total card ───────────────────────── */
+        html[data-theme="dark"] .order-total-card { background: linear-gradient(135deg, #1c2329, #161b22) !important; }
+
+        /* ── Headings & text everywhere ─────────────── */
+        html[data-theme="dark"] h1, html[data-theme="dark"] h2,
+        html[data-theme="dark"] h3, html[data-theme="dark"] h4,
+        html[data-theme="dark"] h5, html[data-theme="dark"] h6,
+        html[data-theme="dark"] .section-title,
+        html[data-theme="dark"] .commande-id,
+        html[data-theme="dark"] .boycott-stat-value,
+        html[data-theme="dark"] .boycott-card-name,
+        html[data-theme="dark"] .boycott-card-link,
+        html[data-theme="dark"] .vote-score,
+        html[data-theme="dark"] .vote-score-lg,
+        html[data-theme="dark"] .alt-vote-score,
+        html[data-theme="dark"] .stat-value,
+        html[data-theme="dark"] .product-card-title,
+        html[data-theme="dark"] .podium-name,
+        html[data-theme="dark"] .ligne-name,
+        html[data-theme="dark"] .ligne-subtotal,
+        html[data-theme="dark"] .alt-section-header h3,
+        html[data-theme="dark"] .alt-table .alt-name,
+        html[data-theme="dark"] .alt-table .alt-price,
+        html[data-theme="dark"] .meta-item strong { color: #c9d1d9 !important; }
+
+        html[data-theme="dark"] .stat-label,
+        html[data-theme="dark"] .boycott-stat-label,
+        html[data-theme="dark"] .boycott-card-desc,
+        html[data-theme="dark"] .boycott-detail-description,
+        html[data-theme="dark"] .product-card-supplier,
+        html[data-theme="dark"] .commande-date,
+        html[data-theme="dark"] .commande-items-count,
+        html[data-theme="dark"] .meta-item span,
+        html[data-theme="dark"] .vote-label,
+        html[data-theme="dark"] .alt-table tbody td,
+        html[data-theme="dark"] .notif-page-msg,
+        html[data-theme="dark"] .empty-state h4,
+        html[data-theme="dark"] .empty-state p { color: #8b949e !important; }
+
+        /* ── Vote / alt vote buttons ───────────────── */
+        html[data-theme="dark"] .vote-btn,
+        html[data-theme="dark"] .vote-btn-lg,
+        html[data-theme="dark"] .alt-vote-btn { background: #1c2329 !important; color: #8b949e !important; border-color: #30363d !important; }
+        html[data-theme="dark"] .vote-btn.active-up,
+        html[data-theme="dark"] .vote-btn-lg.active-up,
+        html[data-theme="dark"] .alt-vote-btn.active-up { background: #1c3a1e !important; color: #91B893 !important; border-color: #346636 !important; }
+        html[data-theme="dark"] .vote-btn.active-down,
+        html[data-theme="dark"] .vote-btn-lg.active-down,
+        html[data-theme="dark"] .alt-vote-btn.active-down { background: #3a1c20 !important; color: #E54A5F !important; border-color: #5a2d32 !important; }
+
+        /* ── Filters / search inputs ─────────────────── */
+        html[data-theme="dark"] .search-input-wrapper input,
+        html[data-theme="dark"] .boycott-filter-bar input,
+        html[data-theme="dark"] .boycott-filter-bar select,
+        html[data-theme="dark"] .filter-select,
+        html[data-theme="dark"] .stock-input {
+            background: #0d1117 !important;
+            color: #c9d1d9 !important;
+            border-color: #30363d !important;
+        }
+        html[data-theme="dark"] .search-input-wrapper input::placeholder,
+        html[data-theme="dark"] .boycott-filter-bar input::placeholder { color: #6e7681 !important; }
+
+        /* ── Image placeholders / wrappers ──────────── */
+        html[data-theme="dark"] .product-card-img-wrapper,
+        html[data-theme="dark"] .product-card-placeholder,
+        html[data-theme="dark"] .boycott-card-img-wrapper,
+        html[data-theme="dark"] .ligne-placeholder { background: #1c2329 !important; }
+
+        /* ── Notification page ──────────────────────── */
+        html[data-theme="dark"] .notif-page-item { border-color: #21262d !important; }
+        html[data-theme="dark"] .notif-page-item:hover { background: #1c2329 !important; }
+        html[data-theme="dark"] .notif-page-item.unread { background: #161b22 !important; border-left-color: #3a6b3c !important; }
+        html[data-theme="dark"] .notif-stat { background: linear-gradient(135deg, #1c2329, #1e2a30) !important; }
+
+        /* ── Commande / order ───────────────────────── */
+        html[data-theme="dark"] .commande-card { color: #c9d1d9 !important; }
+        html[data-theme="dark"] .commande-card:hover { color: #c9d1d9 !important; }
+        html[data-theme="dark"] .commande-arrow { color: #30363d !important; }
+        html[data-theme="dark"] .commande-card:hover .commande-arrow { color: #c9d1d9 !important; }
+        html[data-theme="dark"] .order-timeline-item,
+        html[data-theme="dark"] .order-timeline-dot { background: #161b22 !important; border-color: #30363d !important; }
+        html[data-theme="dark"] .ligne-qty { background: #1c3a1e !important; color: #91B893 !important; }
+
+        /* ── Leaderboard podium ─────────────────────── */
+        html[data-theme="dark"] .podium-item { box-shadow: 0 4px 20px rgba(0,0,0,.4) !important; }
+        html[data-theme="dark"] .podium-name { color: #c9d1d9 !important; }
+        html[data-theme="dark"] .leaderboard-row,
+        html[data-theme="dark"] .leaderboard-item { background: #161b22 !important; color: #c9d1d9 !important; }
+        html[data-theme="dark"] .leaderboard-row:hover,
+        html[data-theme="dark"] .leaderboard-item:hover { background: #1c2329 !important; }
+
+        /* ── Admin moderation ───────────────────────── */
+        html[data-theme="dark"] .pending-card { border-left-color: #30363d !important; }
+        html[data-theme="dark"] .btn-approve { background: #1c3a1e !important; color: #91B893 !important; border-color: #346636 !important; }
+        html[data-theme="dark"] .btn-reject { background: #3a1c20 !important; color: #E54A5F !important; border-color: #5a2d32 !important; }
+        html[data-theme="dark"] .btn-reject:hover { background: #2d1518 !important; }
+        html[data-theme="dark"] .btn-delete-admin:hover { background: #2d1518 !important; color: #E54A5F !important; }
+
+        /* ── File upload / toggle switch ───────────── */
+        html[data-theme="dark"] .file-upload-zone { background: #1c2329 !important; border-color: #30363d !important; color: #8b949e !important; }
+        html[data-theme="dark"] .file-upload-zone:hover { background: #1e2a30 !important; border-color: #91B893 !important; }
+        html[data-theme="dark"] .forsale-slider { background: #30363d !important; }
+        html[data-theme="dark"] .forsale-slider::before { background: #c9d1d9 !important; }
+
+        /* ── Confirm modal ──────────────────────────── */
+        html[data-theme="dark"] .confirm-icon-circle.danger { background: #2d1a1e !important; }
+        html[data-theme="dark"] .confirm-icon-circle.warning { background: #2d1f1a !important; }
+        html[data-theme="dark"] .confirm-icon-circle.info { background: #1c3a1e !important; }
+
+        /* ── Scrollbar ──────────────────────────────── */
+        html[data-theme="dark"] ::-webkit-scrollbar-thumb { background: #30363d !important; }
+        html[data-theme="dark"] ::-webkit-scrollbar-thumb:hover { background: #8b949e !important; }
+
+        /* ── Stock badges (keep status colors but darker bg) ─────── */
+        html[data-theme="dark"] .stock-in { background: #1c3a1e !important; color: #91B893 !important; }
+        html[data-theme="dark"] .stock-out { background: #3a1c20 !important; color: #E54A5F !important; }
+
+        /* ── Suggest page ───────────────────────────── */
+        html[data-theme="dark"] .suggest-card { background: #161b22 !important; box-shadow: 0 4px 20px rgba(0,0,0,.3) !important; }
+        html[data-theme="dark"] .suggest-card-body { background: #161b22 !important; }
+        html[data-theme="dark"] .suggest-card .form-group label { color: #c9d1d9 !important; }
+        html[data-theme="dark"] .suggest-card .form-control,
+        html[data-theme="dark"] .suggest-card select { background: #0d1117 !important; color: #c9d1d9 !important; border-color: #30363d !important; }
+        html[data-theme="dark"] .suggest-card .form-control:focus,
+        html[data-theme="dark"] .suggest-card select:focus { border-color: #91B893 !important; background: #0d1117 !important; }
+        html[data-theme="dark"] .suggest-card .form-control::placeholder { color: #6e7681 !important; }
+        html[data-theme="dark"] .info-banner { background: rgba(145,184,147,.07) !important; border-color: rgba(145,184,147,.18) !important; }
+        html[data-theme="dark"] .info-banner p { color: #8b949e !important; }
+        html[data-theme="dark"] .form-hint { color: #6e7681 !important; }
+
+        /* ── Leaderboard table & reputation guide ───── */
+        html[data-theme="dark"] .leaderboard-table-wrapper { background: #161b22 !important; box-shadow: 0 2px 12px rgba(0,0,0,.3) !important; }
+        html[data-theme="dark"] .leaderboard-table thead th { background: #1c2329 !important; color: #8b949e !important; border-color: #30363d !important; }
+        html[data-theme="dark"] .leaderboard-table tbody td { color: #8b949e !important; border-color: #21262d !important; }
+        html[data-theme="dark"] .leaderboard-table tbody tr:hover { background: #1c2329 !important; }
+        html[data-theme="dark"] .leaderboard-rank { color: #c9d1d9 !important; }
+        html[data-theme="dark"] .leaderboard-user-name { color: #c9d1d9 !important; }
+        html[data-theme="dark"] .leaderboard-user-badge { color: #8b949e !important; }
+        html[data-theme="dark"] .leaderboard-highlight { background: linear-gradient(90deg, rgba(145,184,147,.1), transparent) !important; }
+        html[data-theme="dark"] .reputation-guide { background: #161b22 !important; box-shadow: 0 2px 12px rgba(0,0,0,.3) !important; }
+        html[data-theme="dark"] .reputation-guide h4 { color: #c9d1d9 !important; }
+        html[data-theme="dark"] .rep-tier { background: #1c2329 !important; }
+        html[data-theme="dark"] .rep-tier-name { color: #c9d1d9 !important; }
+        html[data-theme="dark"] .rep-tier-points { color: #8b949e !important; }
+        html[data-theme="dark"] .point-item { background: #1c2329 !important; color: #8b949e !important; }
+        html[data-theme="dark"] .point-item .pts { color: #91B893 !important; }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <div class="logo-icon"><i class="bi bi-flag-fill"></i></div>
+            <span>{{ 'brand.name'|trans }}</span>
+        </div>
+        <nav class="sidebar-nav">
+            {% if not is_granted('ROLE_ADMIN') %}
+                <div class="nav-section">{{ 'nav.shop'|trans }}</div>
+                <a href="{{ app.user ? path('app_dashboard') : path('app_home') }}"
+                   class="{{ (app.request.get('_route') starts with 'app_dashboard' or app.request.get('_route') == 'app_home') ? 'active' : '' }}">
+                    <i class="bi bi-shop-window"></i> {{ 'nav.dashboard'|trans }}
+                </a>
+                {% if app.user %}
+                    <a href="{{ path('app_commande_index') }}"
+                       class="{{ app.request.get('_route') starts with 'app_commande' ? 'active' : '' }}">
+                        <i class="bi bi-receipt"></i> {{ 'nav.my_orders'|trans }}
+                    </a>
+                    <a href="{{ path('app_notification_index') }}"
+                       class="{{ app.request.get('_route') starts with 'app_notification' ? 'active' : '' }}">
+                        <i class="bi bi-bell"></i> {{ 'nav.notifications'|trans }}
+                        {% if notif_unread_count > 0 %}
+                            <span style="background:linear-gradient(135deg,#E54A5F,#c93d4f);color:#fff;font-size:.6rem;font-weight:700;padding:.1rem .45rem;border-radius:999px;margin-left:auto">{{ notif_unread_count }}</span>
+                        {% endif %}
+                    </a>
+                {% else %}
+                    {# Guest: invite to sign in #}
+                    <a href="{{ path('app_login') }}"
+                       class="{{ app.request.get('_route') == 'app_login' ? 'active' : '' }}"
+                       style="color:#E54A5F;font-weight:600">
+                        <i class="bi bi-box-arrow-in-right"></i> {{ 'guest.signin'|trans }}
+                    </a>
+                    <a href="{{ path('app_register') }}"
+                       class="{{ app.request.get('_route') == 'app_register' ? 'active' : '' }}"
+                       style="color:#91B893;font-weight:600">
+                        <i class="bi bi-person-plus"></i> {{ 'guest.create_account'|trans }}
+                    </a>
+                {% endif %}
+            {% endif %}
+
+            <div class="nav-section">{{ 'nav.boycott'|trans }}</div>
+            <a href="{{ path('app_boycott_index') }}"
+               class="{{ app.request.get('_route') == 'app_boycott_index' or app.request.get('_route') == 'app_boycott_show' ? 'active' : '' }}">
+                <i class="bi bi-flag"></i> {{ 'nav.boycotts'|trans }}
+            </a>
+            <a href="{{ path('app_boycott_suggest') }}"
+               class="{{ app.request.get('_route') == 'app_boycott_suggest' ? 'active' : '' }}">
+                <i class="bi bi-plus-circle"></i> {{ 'nav.suggest'|trans }}
+            </a>
+            <a href="{{ path('app_boycott_leaderboard') }}"
+               class="{{ app.request.get('_route') == 'app_boycott_leaderboard' ? 'active' : '' }}">
+                <i class="bi bi-trophy"></i> {{ 'nav.ranking'|trans }}
+            </a>
+            {% if is_granted('ROLE_ADMIN') %}
+                <a href="{{ path('app_boycott_admin_pending') }}"
+                   class="{{ app.request.get('_route') starts with 'app_boycott_admin' ? 'active' : '' }}">
+                    <i class="bi bi-shield-check"></i> {{ 'nav.moderation'|trans }}
+                </a>
+            {% endif %}
+
+            {% if is_granted('ROLE_ADMIN') %}
+                <div class="nav-section">{{ 'nav.management'|trans }}</div>
+                <a href="{{ path('app_product_index') }}"
+                   class="{{ app.request.get('_route') starts with 'app_product' ? 'active' : '' }}">
+                    <i class="bi bi-bag-heart"></i> {{ 'nav.products'|trans }}
+                </a>
+                <a href="{{ path('app_category_index') }}"
+                   class="{{ app.request.get('_route') starts with 'app_category' ? 'active' : '' }}">
+                    <i class="bi bi-palette"></i> {{ 'nav.categories'|trans }}
+                </a>
+                <a href="{{ path('app_supplier_index') }}"
+                   class="{{ app.request.get('_route') starts with 'app_supplier' ? 'active' : '' }}">
+                    <i class="bi bi-truck"></i> {{ 'nav.suppliers'|trans }}
+                </a>
+                <a href="{{ path('app_notification_index') }}"
+                   class="{{ app.request.get('_route') starts with 'app_notification' ? 'active' : '' }}">
+                    <i class="bi bi-bell"></i> {{ 'nav.notifications'|trans }}
+                    {% if notif_unread_count > 0 %}
+                        <span style="background:linear-gradient(135deg,#E54A5F,#c93d4f);color:#fff;font-size:.6rem;font-weight:700;padding:.1rem .45rem;border-radius:999px;margin-left:auto">{{ notif_unread_count }}</span>
+                    {% endif %}
+                </a>
+            {% endif %}
+        </nav>
+        <div class="sidebar-footer">
+            <div class="pulse-dot"></div>
+            <span>{{ 'nav.system_online'|trans }}</span>
+        </div>
+    </aside>
+
+    <!-- Backdrop (mobile) -->
+    <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar()"></div>
+
+    <!-- Main -->
+    <div class="main-wrapper">
+        <header class="topbar">
+            <div class="d-flex align-items-center gap-3">
+                <button class="sidebar-toggler" onclick="toggleSidebar()"><i class="bi bi-list"></i></button>
+                <h1>{% block page_title %}Dashboard{% endblock %}</h1>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                {# ── Dark mode toggle ── #}
+                <button id="themeToggle" onclick="toggleTheme()" title="Toggle dark/light mode"
+                        style="background:none;border:none;cursor:pointer;font-size:1.2rem;padding:.3rem .4rem;border-radius:.5rem;transition:all .3s var(--transition-bounce);color:var(--text-primary);">
+                    <i class="bi" id="themeIcon"></i>
+                </button>
+                <span class="date-badge"><i class="bi bi-calendar3"></i>{{ "now"|date("M d, Y") }}</span>
+                {% if app.user %}
+                    {# ── Notification bell ── #}
+                    <div class="notif-wrapper">
+                        <button class="notif-btn" onclick="toggleNotifDropdown(event)" title="Notifications">
+                            <i class="bi bi-bell"></i>
+                            {% if notif_unread_count > 0 %}
+                                <span class="notif-badge" id="notifBadge">{{ notif_unread_count }}</span>
+                            {% endif %}
+                        </button>
+                        <div class="notif-dropdown" id="notifDropdown">
+                            <div class="notif-dropdown-header">
+                                <h6><i class="bi bi-bell me-1"></i> {{ 'nav.notifications'|trans }}</h6>
+                                {% if notif_unread_count > 0 %}
+                                    <a href="{{ path('app_notification_read_all') }}" style="font-size:.72rem;color:#91B893;text-decoration:none;font-weight:600">
+                                        {{ 'topbar.mark_all_read'|trans }}
+                                    </a>
+                                {% endif %}
+                            </div>
+                            <div class="notif-dropdown-body">
+                                {% if notif_recent|length > 0 %}
+                                    {% for notif in notif_recent %}
+                                        <a href="{{ path('app_notification_read', {id: notif.id}) }}" class="notif-item {{ not notif.isRead ? 'unread' : '' }}">
+                                            <div class="notif-item-icon" style="background:{{ notif.typeColor }}">
+                                                <i class="bi {{ notif.displayIcon }}"></i>
+                                            </div>
+                                            <div class="notif-item-content">
+                                                <div class="notif-item-msg">{{ notif.message }}</div>
+                                                <div class="notif-item-time"><i class="bi bi-clock me-1"></i>{{ notif.timeAgo }}</div>
+                                            </div>
+                                            {% if not notif.isRead %}
+                                                <div style="width:8px;height:8px;background:#E54A5F;border-radius:50%;flex-shrink:0;align-self:center"></div>
+                                            {% endif %}
+                                        </a>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="notif-empty">
+                                        <i class="bi bi-bell-slash"></i>
+                                        <p style="font-size:.82rem;margin:0">{{ 'topbar.no_notifications'|trans }}</p>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="notif-dropdown-footer">
+                                <a href="{{ path('app_notification_index') }}"><i class="bi bi-list-ul me-1"></i>{{ 'topbar.see_all'|trans }}</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+                {% if app.user and not is_granted('ROLE_ADMIN') %}
+                    {% set cartCount = 0 %}
+                    {% set cart = app.session.get('cart', []) %}
+                    {% for qty in cart %}{% set cartCount = cartCount + qty %}{% endfor %}
+                    <a href="{{ path('app_cart_index') }}" class="cart-topbar-btn" title="{{ 'topbar.cart'|trans }}" style="position:relative;text-decoration:none;color:var(--text-primary);font-size:1.3rem;transition:all .3s var(--transition-bounce);">
+                        <i class="bi bi-cart3"></i>
+                        {% if cartCount > 0 %}
+                            <span class="cart-badge" style="position:absolute;top:-6px;right:-10px;background:linear-gradient(135deg,#E54A5F,#c93d4f);color:#fff;font-size:.6rem;font-weight:800;width:18px;height:18px;border-radius:50%;display:grid;place-items:center;box-shadow:0 2px 8px rgba(229,74,95,.4);animation:pulse 2s ease-in-out infinite">{{ cartCount }}</span>
+                        {% endif %}
+                    </a>
+                {% endif %}
+                {% if not app.user %}
+                    <div class="d-flex align-items-center gap-2 topbar-user-section">
+                        <a href="{{ path('app_login') }}" class="topbar-login-btn">
+                            <i class="bi bi-box-arrow-in-right"></i> {{ 'guest.signin'|trans }}
+                        </a>
+                        <a href="{{ path('app_register') }}" style="background:linear-gradient(135deg,#91B893,#7aa67c);color:#fff;padding:.3rem .9rem;border-radius:.6rem;font-size:.8rem;font-weight:600;text-decoration:none;display:flex;align-items:center;gap:.4rem;box-shadow:0 2px 8px rgba(145,184,147,.3)">
+                            <i class="bi bi-person-plus"></i> {{ 'guest.create_account'|trans }}
+                        </a>
+                    </div>
+                {% endif %}
+                {% if app.user %}
+                    <div class="d-flex align-items-center gap-2 topbar-user-section">
+                        <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#2A3638,#4a6264);display:grid;place-items:center;color:#fff;font-size:.75rem;font-weight:700">
+                            {{ (app.user.prenom ?? app.user.email)|first|upper }}
+                        </div>
+                        <span class="topbar-username">{{ app.user.prenom ?? '' }} {{ app.user.nom ?? '' }}</span>
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <span style="background:linear-gradient(135deg,#F1947C,#e07c62);color:#fff;font-size:.6rem;font-weight:700;padding:.15rem .5rem;border-radius:999px">{{ 'topbar.admin'|trans }}</span>
+                        {% else %}
+                            <span style="background:linear-gradient(135deg,#91B893,#7aa67c);color:#fff;font-size:.6rem;font-weight:700;padding:.15rem .5rem;border-radius:999px">{{ 'topbar.client'|trans }}</span>
+                        {% endif %}
+                        {# ── Language switcher ── #}
+                        {% set currentLocale = app.request.locale %}
+                        <div style="display:flex;align-items:center;gap:.3rem;padding-left:.3rem">
+                            <a href="{{ path('app_switch_locale', {locale: 'fr'}) }}"
+                               title="Français"
+                               class="topbar-locale-btn {{ currentLocale == 'fr' ? 'active' : '' }}">FR</a>
+                            <a href="{{ path('app_switch_locale', {locale: 'en'}) }}"
+                               title="English"
+                               class="topbar-locale-btn {{ currentLocale == 'en' ? 'active' : '' }}">EN</a>
+                        </div>
+                        <a href="{{ path('app_logout') }}" class="btn btn-ghost" style="color:#E54A5F;font-size:.82rem" title="{{ 'topbar.logout'|trans }}">
+                            <i class="bi bi-box-arrow-right"></i>
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </header>
+        <main class="content-area">
+            {% block body %}{% endblock %}
+        </main>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="confirm-overlay" id="confirmOverlay">
+        <div class="confirm-box">
+            <div class="confirm-icon-area">
+                <div class="confirm-icon-circle" id="confirmIconCircle">
+                    <i class="bi" id="confirmIcon"></i>
+                </div>
+            </div>
+            <div class="confirm-body">
+                <div class="confirm-title" id="confirmTitle"></div>
+                <div class="confirm-message" id="confirmMessage"></div>
+            </div>
+            <div class="confirm-actions">
+                <button type="button" class="confirm-btn-cancel" onclick="closeConfirm()">{{ 'confirm.cancel'|trans }}</button>
+                <button type="button" class="confirm-btn-confirm" id="confirmBtn" onclick="executeConfirm()">{{ 'confirm.confirm'|trans }}</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function toggleSidebar(){
+            document.getElementById('sidebar').classList.toggle('show');
+            document.getElementById('sidebarBackdrop').classList.toggle('show');
+        }
+
+        // ── Dark / Light mode ──
+        function applyTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+            const icon = document.getElementById('themeIcon');
+            if (icon) {
+                icon.className = theme === 'dark' ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
+            }
+        }
+        function toggleTheme() {
+            const current = document.documentElement.getAttribute('data-theme') || 'light';
+            applyTheme(current === 'dark' ? 'light' : 'dark');
+        }
+        // Set the correct icon on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const saved = localStorage.getItem('theme') || 'light';
+            applyTheme(saved);
+        });
+
+        // Notification dropdown
+        function toggleNotifDropdown(e) {
+            e.stopPropagation();
+            const dd = document.getElementById('notifDropdown');
+            dd.classList.toggle('show');
+        }
+        document.addEventListener('click', function(e) {
+            const dd = document.getElementById('notifDropdown');
+            if (dd && !e.target.closest('.notif-wrapper')) {
+                dd.classList.remove('show');
+            }
+        });
+
+        // ── Confirmation popup system ──
+        let confirmCallback = null;
+
+        function showConfirm(opts) {
+            const overlay = document.getElementById('confirmOverlay');
+            const iconCircle = document.getElementById('confirmIconCircle');
+            const icon = document.getElementById('confirmIcon');
+            const title = document.getElementById('confirmTitle');
+            const message = document.getElementById('confirmMessage');
+            const btn = document.getElementById('confirmBtn');
+
+            const variant = opts.variant || 'danger';
+            iconCircle.className = 'confirm-icon-circle ' + variant;
+            icon.className = 'bi ' + (opts.icon || 'bi-exclamation-triangle');
+            title.textContent = opts.title || '{{ 'common.confirm'|trans }}';
+            message.textContent = opts.message || '{{ 'common.confirm_action'|trans }}';
+            btn.className = 'confirm-btn-confirm ' + variant;
+            btn.textContent = opts.btnText || '{{ 'common.yes'|trans }}';
+
+            confirmCallback = opts.onConfirm || null;
+            overlay.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeConfirm() {
+            document.getElementById('confirmOverlay').classList.remove('show');
+            document.body.style.overflow = '';
+            confirmCallback = null;
+        }
+
+        function executeConfirm() {
+            if (confirmCallback) confirmCallback();
+            closeConfirm();
+        }
+
+        // Close on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeConfirm();
+        });
+
+        // Close on overlay click (outside the box)
+        document.getElementById('confirmOverlay').addEventListener('click', function(e) {
+            if (e.target === this) closeConfirm();
+        });
+
+        // Auto-bind all elements with data-confirm attribute
+        document.addEventListener('DOMContentLoaded', function() {
+            // Forms with data-confirm
+            document.querySelectorAll('form[data-confirm]').forEach(function(form) {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    showConfirm({
+                        title: form.dataset.confirmTitle || 'Confirmer la suppression',
+                        message: form.dataset.confirm,
+                        icon: form.dataset.confirmIcon || 'bi-trash3',
+                        variant: form.dataset.confirmVariant || 'danger',
+                        btnText: form.dataset.confirmBtn || '{{ 'common.delete'|trans }}',
+                        onConfirm: function() { form.submit(); }
+                    });
+                });
+            });
+
+            // Links with data-confirm
+            document.querySelectorAll('a[data-confirm]').forEach(function(link) {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    showConfirm({
+                        title: link.dataset.confirmTitle || 'Confirmer',
+                        message: link.dataset.confirm,
+                        icon: link.dataset.confirmIcon || 'bi-exclamation-circle',
+                        variant: link.dataset.confirmVariant || 'warning',
+                        btnText: link.dataset.confirmBtn || 'Confirmer',
+                        onConfirm: function() { window.location.href = link.href; }
+                    });
+                });
+            });
+        });
+    </script>
+    {% block javascripts %}{% endblock %}
+</body>
+</html>

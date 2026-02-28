@@ -16,6 +16,43 @@ class ProductRepository extends ServiceEntityRepository
         parent::__construct($registry, Product::class);
     }
 
+    /**
+     * @return Product[]
+     */
+    public function searchAndFilter(?string $search = null, ?int $categoryId = null, ?int $supplierId = null, ?string $stock = null): array
+    {
+        $qb = $this->createQueryBuilder('p')
+            ->leftJoin('p.category', 'c')
+            ->leftJoin('p.supplier_id', 's');
+
+        if ($search) {
+            $qb->andWhere('p.label LIKE :search OR c.name LIKE :search OR s.name_supp LIKE :search')
+               ->setParameter('search', '%' . $search . '%');
+        }
+
+        if ($categoryId) {
+            $qb->andWhere('c.id = :catId')
+               ->setParameter('catId', $categoryId);
+        }
+
+        if ($supplierId) {
+            $qb->andWhere('s.id = :supId')
+               ->setParameter('supId', $supplierId);
+        }
+
+        if ($stock === 'in') {
+            $qb->andWhere('p.quantity > 0');
+        } elseif ($stock === 'out') {
+            $qb->andWhere('p.quantity <= 0');
+        } elseif ($stock === 'low') {
+            $qb->andWhere('p.quantity > 0 AND p.quantity <= 5');
+        }
+
+        return $qb->orderBy('p.id', 'DESC')
+                  ->getQuery()
+                  ->getResult();
+    }
+
     //    /**
     //     * @return Product[] Returns an array of Product objects
     //     */

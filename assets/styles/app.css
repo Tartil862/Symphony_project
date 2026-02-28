@@ -1,3 +1,4 @@
+/* Custom styles are defined inline in base.html.twig */
 body {
-    background-color: skyblue;
+    background: #f0f2f8;
 }

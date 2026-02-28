@@ -1,0 +1,566 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dashboard - Boutique{% endblock %}
+{% block page_title %}🛍️ {{ 'nav.shop'|trans }}{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .product-card {
+        border: none;
+        border-radius: 1.2rem;
+        overflow: hidden;
+        background: #fff;
+        box-shadow: 0 2px 12px rgba(0,0,0,.06);
+        transition: all .4s cubic-bezier(.4,0,.2,1);
+        position: relative;
+    }
+    .product-card:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 20px 40px rgba(42,54,56,.15), 0 4px 12px rgba(0,0,0,.08);
+    }
+
+    .product-card-img {
+        width: 100%;
+        height: 220px;
+        object-fit: cover;
+        transition: transform .5s cubic-bezier(.4,0,.2,1);
+    }
+    .product-card:hover .product-card-img {
+        transform: scale(1.08);
+    }
+
+    .product-card-img-wrapper {
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(135deg, #f5f0ea, #efe8df, #e8dfd5);
+    }
+
+    .product-card-placeholder {
+        width: 100%;
+        height: 220px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #f5f0ea, #efe8df, #e8dfd5);
+        color: #c4b5a0;
+        font-size: 3.5rem;
+    }
+
+    .product-card-badge {
+        position: absolute;
+        top: .8rem;
+        right: .8rem;
+        background: linear-gradient(135deg, #2A3638, #4a6264);
+        color: #fff;
+        font-size: .7rem;
+        font-weight: 700;
+        padding: .35rem .75rem;
+        border-radius: 999px;
+        box-shadow: 0 4px 12px rgba(42,54,56,.4);
+        z-index: 2;
+    }
+
+    .coupon-ribbon {
+        position: absolute;
+        top: 14px;
+        left: -6px;
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        color: #fff;
+        font-size: .68rem;
+        font-weight: 800;
+        padding: .3rem .75rem .3rem .55rem;
+        border-radius: 0 999px 999px 0;
+        box-shadow: 0 3px 10px rgba(245,158,11,.45);
+        z-index: 3;
+        display: flex;
+        align-items: center;
+        gap: .3rem;
+        letter-spacing: .02em;
+        text-transform: uppercase;
+    }
+    .coupon-ribbon::before {
+        content: '';
+        position: absolute;
+        bottom: -5px;
+        left: 0;
+        width: 6px;
+        height: 6px;
+        background: #92400e;
+        clip-path: polygon(0 0, 100% 0, 100% 100%);
+    }
+
+    .product-card-body {
+        padding: 1.3rem;
+    }
+
+    .product-card-category {
+        font-size: .72rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: .06em;
+        color: #91B893;
+        margin-bottom: .3rem;
+    }
+
+    .product-card-title {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: .4rem;
+        line-height: 1.3;
+    }
+
+    .product-card-supplier {
+        font-size: .78rem;
+        color: #94a3b8;
+        margin-bottom: .8rem;
+        display: flex;
+        align-items: center;
+        gap: .3rem;
+    }
+
+    .product-card-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 1.3rem 1.3rem;
+    }
+
+    .product-card-price {
+        font-size: 1.25rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #E54A5F, #F1947C);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .btn-add-cart {
+        background: linear-gradient(135deg, #91B893, #7aa67c);
+        color: #fff;
+        border: none;
+        padding: .55rem 1.1rem;
+        border-radius: .65rem;
+        font-weight: 600;
+        font-size: .82rem;
+        display: flex;
+        align-items: center;
+        gap: .4rem;
+        transition: all .35s cubic-bezier(.4,0,.2,1);
+        box-shadow: 0 4px 12px rgba(145,184,147,.25);
+        text-decoration: none;
+    }
+    .btn-add-cart:hover {
+        transform: translateY(-2px) scale(1.05);
+        box-shadow: 0 8px 20px rgba(145,184,147,.4);
+        color: #fff;
+    }
+    .btn-add-cart:active {
+        transform: scale(.95);
+    }
+
+    .dashboard-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: #fff;
+        border-radius: 1rem;
+        padding: 1.3rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,.04);
+        transition: all .3s ease;
+    }
+    .stat-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0,0,0,.08);
+    }
+
+    .stat-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: .8rem;
+        display: grid;
+        place-items: center;
+        font-size: 1.3rem;
+        color: #fff;
+    }
+
+    .stat-icon.purple { background: linear-gradient(135deg, #2A3638, #4a6264); }
+    .stat-icon.green { background: linear-gradient(135deg, #91B893, #7aa67c); }
+    .stat-icon.blue { background: linear-gradient(135deg, #E5C6A4, #d4b08e); }
+    .stat-icon.pink { background: linear-gradient(135deg, #E54A5F, #F1947C); }
+
+    .stat-value {
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: #1e293b;
+        line-height: 1;
+    }
+    .stat-label {
+        font-size: .75rem;
+        color: #94a3b8;
+        font-weight: 500;
+    }
+
+    .section-title {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: #2A3638;
+        margin-bottom: 1.2rem;
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+    }
+
+    /* Flash messages */
+    .flash-toast {
+        position: fixed;
+        top: 80px;
+        right: 2rem;
+        z-index: 9999;
+        animation: slideInRight .4s cubic-bezier(.4,0,.2,1);
+    }
+    @keyframes slideInRight {
+        from { opacity: 0; transform: translateX(40px); }
+        to   { opacity: 1; transform: translateX(0); }
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: #94a3b8;
+    }
+    .empty-state i {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        color: #E5C6A4;
+    }
+
+    /* Search & Filter Bar */
+    .search-filter-bar {
+        background: #fff;
+        border-radius: 1rem;
+        padding: 1.2rem 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,.04);
+        display: flex;
+        flex-wrap: wrap;
+        gap: .8rem;
+        align-items: center;
+    }
+    .search-input-wrapper {
+        position: relative;
+        flex: 1;
+        min-width: 220px;
+    }
+    .search-input-wrapper i {
+        position: absolute;
+        left: .9rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #c4b5a0;
+        font-size: .95rem;
+    }
+    .search-input-wrapper input {
+        width: 100%;
+        padding: .6rem .9rem .6rem 2.5rem;
+        border: 2px solid #ddd0bf;
+        border-radius: .65rem;
+        font-size: .88rem;
+        font-family: 'Inter', sans-serif;
+        transition: all .3s ease;
+        outline: none;
+    }
+    .search-input-wrapper input:focus {
+        border-color: #91B893;
+        box-shadow: 0 0 0 4px rgba(145,184,147,.1);
+    }
+    .filter-select {
+        padding: .6rem 1rem;
+        border: 2px solid #ddd0bf;
+        border-radius: .65rem;
+        font-size: .82rem;
+        font-weight: 500;
+        color: #2A3638;
+        background: #fff;
+        cursor: pointer;
+        transition: all .3s ease;
+        font-family: 'Inter', sans-serif;
+        outline: none;
+        min-width: 140px;
+    }
+    .filter-select:focus {
+        border-color: #91B893;
+        box-shadow: 0 0 0 4px rgba(145,184,147,.1);
+    }
+    .btn-search {
+        background: linear-gradient(135deg, #2A3638, #4a6264);
+        color: #fff;
+        border: none;
+        padding: .6rem 1.2rem;
+        border-radius: .65rem;
+        font-weight: 600;
+        font-size: .82rem;
+        display: flex;
+        align-items: center;
+        gap: .4rem;
+        cursor: pointer;
+        transition: all .3s ease;
+        font-family: 'Inter', sans-serif;
+    }
+    .btn-search:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 15px rgba(42,54,56,.3);
+    }
+    .btn-clear-filter {
+        background: transparent;
+        border: 2px solid #ddd0bf;
+        color: #94a3b8;
+        padding: .6rem .9rem;
+        border-radius: .65rem;
+        font-size: .82rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all .3s ease;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: .3rem;
+    }
+    .btn-clear-filter:hover {
+        border-color: #E54A5F;
+        color: #E54A5F;
+    }
+    .active-filters {
+        display: flex;
+        gap: .4rem;
+        flex-wrap: wrap;
+    }
+    .filter-tag {
+        background: linear-gradient(135deg, #e8f0e9, #dde8de);
+        color: #2A3638;
+        font-size: .7rem;
+        font-weight: 600;
+        padding: .25rem .6rem;
+        border-radius: 999px;
+        display: flex;
+        align-items: center;
+        gap: .3rem;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+    {# Flash messages #}
+    {% for type, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="flash-toast">
+                <div class="alert alert-{{ type == 'success' ? 'success' : (type == 'warning' ? 'warning' : 'info') }} alert-dismissible fade show d-flex align-items-center gap-2" style="border-radius:.8rem;border:none;box-shadow:0 8px 25px rgba(0,0,0,.1)">
+                    <i class="bi bi-{{ type == 'success' ? 'check-circle-fill' : (type == 'warning' ? 'exclamation-triangle-fill' : 'info-circle-fill') }}"></i>
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    {# Stats #}
+    {% if not isGuest|default(false) %}
+    <div class="dashboard-stats">
+        <div class="stat-card">
+            <div class="stat-icon purple"><i class="bi bi-box-seam"></i></div>
+            <div>
+                <div class="stat-value">{{ products|length }}</div>
+                <div class="stat-label">Produits disponibles</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon green"><i class="bi bi-cart3"></i></div>
+            <div>
+                {% set cartCount = 0 %}
+                {% set cart = app.session.get('cart', []) %}
+                {% for qty in cart %}{% set cartCount = cartCount + qty %}{% endfor %}
+                <div class="stat-value">{{ cartCount }}</div>
+                <div class="stat-label">{{ 'dashboard.in_cart'|trans }}</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon blue"><i class="bi bi-bag-check"></i></div>
+            <div>
+                <div class="stat-value"><i class="bi bi-arrow-right" style="font-size:.9rem"></i></div>
+                <div class="stat-label"><a href="{{ path('app_commande_index') }}" style="color:#2A3638;text-decoration:none;font-weight:600">{{ 'dashboard.my_orders_link'|trans }}</a></div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon pink"><i class="bi bi-heart"></i></div>
+            <div>
+                <div class="stat-value">{{ 'topbar.welcome'|trans }}</div>
+                <div class="stat-label">{{ app.user.prenom ?? '' }} {{ app.user.nom ?? '' }}</div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    {# Guest hero banner — call to action #}
+    <div style="background:linear-gradient(135deg,#1a2e1f,#2A3638);border-radius:1.2rem;padding:2rem 2.2rem;margin-bottom:1.8rem;position:relative;overflow:hidden;">
+        <div style="position:absolute;top:-30px;right:-30px;width:180px;height:180px;background:radial-gradient(circle,rgba(145,184,147,.25),transparent 70%);border-radius:50%;"></div>
+        <div style="position:absolute;bottom:-20px;left:40px;width:120px;height:120px;background:radial-gradient(circle,rgba(229,74,95,.15),transparent 70%);border-radius:50%;"></div>
+        <div style="display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap;position:relative;z-index:1;">
+            <div style="font-size:3rem;line-height:1;">🇵🇸</div>
+            <div style="flex:1;min-width:220px;">
+                <div style="font-size:1.15rem;font-weight:800;color:#fff;margin-bottom:.5rem;line-height:1.35;">{{ 'guest.cta_title'|trans }}</div>
+                <div style="font-size:.88rem;color:rgba(255,255,255,.75);line-height:1.6;margin-bottom:1.1rem;">{{ 'guest.cta_desc'|trans }}</div>
+                <div style="display:flex;gap:.8rem;flex-wrap:wrap;">
+                    <a href="{{ path('app_register') }}" style="background:linear-gradient(135deg,#E54A5F,#c93d4f);color:#fff;padding:.55rem 1.4rem;border-radius:.7rem;font-size:.88rem;font-weight:700;text-decoration:none;display:flex;align-items:center;gap:.5rem;box-shadow:0 4px 15px rgba(229,74,95,.35);">
+                        <i class="bi bi-person-plus-fill"></i> {{ 'guest.register_btn'|trans }}
+                    </a>
+                    <a href="{{ path('app_login') }}" style="background:rgba(255,255,255,.12);color:#fff;border:1.5px solid rgba(255,255,255,.3);padding:.55rem 1.4rem;border-radius:.7rem;font-size:.88rem;font-weight:600;text-decoration:none;display:flex;align-items:center;gap:.5rem;">
+                        <i class="bi bi-box-arrow-in-right"></i> {{ 'guest.signin'|trans }}
+                    </a>
+                </div>
+            </div>
+            <div style="text-align:right;min-width:110px;">
+                <div style="font-size:.7rem;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.3rem;">{{ 'dashboard.products_section'|trans }}</div>
+                <div style="font-size:2.5rem;font-weight:800;color:#91B893;">{{ products|length }}</div>
+                <div style="font-size:.75rem;color:rgba(255,255,255,.6);">{{ 'dashboard.in_stock'|trans }}</div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {# Product Grid #}
+    <div class="section-title">
+        <i class="bi bi-grid-3x3-gap-fill"></i> {{ 'dashboard.products_section'|trans }}
+        <span class="badge-count ms-2">{{ products|length }}</span>
+    </div>
+
+    {# Search & Filter Bar #}
+    <form method="get" action="{{ isGuest|default(false) ? path('app_home') : path('app_dashboard') }}" class="search-filter-bar">
+        <div class="search-input-wrapper">
+            <i class="bi bi-search"></i>
+            <input type="text" name="q" placeholder="{{ 'dashboard.search_placeholder'|trans }}" value="{{ currentSearch }}">
+        </div>
+        <select name="category" class="filter-select">
+            <option value="">{{ 'dashboard.all_categories'|trans }}</option>
+            {% for cat in categories %}
+                <option value="{{ cat.id }}" {{ currentCategory == cat.id ? 'selected' : '' }}>{{ cat.name }}</option>
+            {% endfor %}
+        </select>
+        <select name="stock" class="filter-select">
+            <option value="">{{ 'dashboard.all_stock'|trans }}</option>
+            <option value="in" {{ currentStock == 'in' ? 'selected' : '' }}>{{ 'dashboard.in_stock'|trans }}</option>
+            <option value="low" {{ currentStock == 'low' ? 'selected' : '' }}>{{ 'dashboard.low_stock_filter'|trans }}</option>
+            <option value="out" {{ currentStock == 'out' ? 'selected' : '' }}>{{ 'dashboard.out_of_stock'|trans }}</option>
+        </select>
+        <button type="submit" class="btn-search"><i class="bi bi-search"></i> {{ 'common.search'|trans }}</button>
+        {% if currentSearch or currentCategory or currentStock %}
+            <a href="{{ path('app_dashboard') }}" class="btn-clear-filter"><i class="bi bi-x-lg"></i> {{ 'common.clear'|trans }}</a>
+        {% endif %}
+    </form>
+
+    {% if currentSearch or currentCategory or currentStock %}
+        <div class="active-filters mb-3">
+            {% if currentSearch %}<span class="filter-tag"><i class="bi bi-search"></i> "{{ currentSearch }}"</span>{% endif %}
+            {% if currentCategory %}
+                {% for cat in categories %}
+                    {% if cat.id == currentCategory %}<span class="filter-tag"><i class="bi bi-palette"></i> {{ cat.name }}</span>{% endif %}
+                {% endfor %}
+            {% endif %}
+            {% if currentStock %}<span class="filter-tag"><i class="bi bi-box"></i> {{ currentStock == 'in' ? 'dashboard.in_stock'|trans : (currentStock == 'low' ? 'dashboard.low_stock_filter'|trans : 'dashboard.out_of_stock'|trans) }}</span>{% endif %}
+        </div>
+    {% endif %}
+
+    {% if products is empty %}
+        <div class="empty-state">
+            <i class="bi bi-box-seam"></i>
+            <h4>{{ 'dashboard.no_products'|trans }}</h4>
+            <p>{{ 'dashboard.empty_desc'|trans }}</p>
+        </div>
+    {% else %}
+        <div class="product-grid">
+            {% for product in products %}
+                <div class="product-card">
+                    <div class="product-card-img-wrapper">
+                        {% if product.image %}
+                            <img src="{{ asset(product.imageFolder ~ '/' ~ product.image) }}" alt="{{ product.label }}" class="product-card-img">
+                        {% else %}
+                            <div class="product-card-placeholder">
+                                <i class="bi bi-image"></i>
+                            </div>
+                        {% endif %}
+                        {% if userCoupon %}
+                            <div class="coupon-ribbon">
+                                <i class="bi bi-ticket-perforated-fill"></i> COUPON &minus;{{ (userCoupon.discountRate * 100)|round }}%
+                            </div>
+                        {% endif %}
+                        {% if product.category %}
+                            <div class="product-card-badge">{{ product.category.name }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="product-card-body">
+                        <div class="product-card-category">
+                            {% if product.category %}{{ product.category.name }}{% else %}{{ 'dashboard.no_category'|trans }}{% endif %}
+                        </div>
+                        <div class="product-card-title">{{ product.label }}</div>
+                        {% if product.supplierId %}
+                            <div class="product-card-supplier">
+                                <i class="bi bi-truck"></i> {{ product.supplierId.nameSupp }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="product-card-footer">
+                        <div>
+                            <div class="product-card-price">{{ product.price is not null ? (product.price|number_format(2, '.', ',') ~ ' DT') : '—' }}</div>
+                            {% if product.quantity <= 0 %}
+                                <span style="font-size:.7rem;color:#E54A5F;font-weight:600">{{ 'dashboard.out_of_stock'|trans }}</span>
+                            {% elseif product.quantity <= 5 %}
+                                <span style="font-size:.7rem;color:#F1947C;font-weight:600">{{ 'dashboard.low_stock'|trans({'%count%': product.quantity}) }}</span>
+                            {% else %}
+                                <span style="font-size:.7rem;color:#91B893;font-weight:600">{{ 'dashboard.in_stock_count'|trans({'%count%': product.quantity}) }}</span>
+                            {% endif %}
+                        </div>
+                        {% if product.quantity > 0 %}
+                            {% if isGuest|default(false) %}
+                                {# Guest: invite to sign in to add to cart #}
+                                <a href="{{ path('app_register') }}" class="btn-add-cart" style="background:linear-gradient(135deg,#E54A5F,#c93d4f);" title="{{ 'guest.signin_to_buy'|trans }}">
+                                    <i class="bi bi-person-plus"></i> {{ 'guest.join_to_buy'|trans }}
+                                </a>
+                            {% else %}
+                                <a href="{{ path('app_cart_add', {id: product.id}) }}" class="btn-add-cart">
+                                    <i class="bi bi-cart-plus"></i> {{ 'dashboard.add_to_cart'|trans }}
+                                </a>
+                            {% endif %}
+                        {% else %}
+                            <span class="btn-add-cart" style="background:#e2e8f0;color:#94a3b8;box-shadow:none;cursor:not-allowed;pointer-events:none">
+                                <i class="bi bi-x-circle"></i> {{ 'dashboard.unavailable'|trans }}
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    // Auto-dismiss flash messages
+    setTimeout(() => {
+        document.querySelectorAll('.flash-toast .alert').forEach(el => {
+            const bsAlert = bootstrap.Alert.getOrCreateInstance(el);
+            bsAlert.close();
+        });
+    }, 3000);
+</script>
+{% endblock %}

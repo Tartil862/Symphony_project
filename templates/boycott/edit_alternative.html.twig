@@ -1,0 +1,305 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'boycott.edit'|trans }} — {{ alternative.name }}{% endblock %}
+{% block page_title %}{{ 'boycott.edit_alt_title'|trans }}{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .alt-wrapper {
+        max-width: 680px;
+        margin: 0 auto;
+    }
+    .back-link {
+        display: inline-flex; align-items: center; gap: .5rem;
+        text-decoration: none; color: #91B893; font-weight: 600;
+        font-size: .85rem; margin-bottom: 1.5rem;
+        transition: all .3s ease;
+    }
+    .back-link:hover { color: #5e8960; transform: translateX(-4px); }
+
+    .boycott-context {
+        background: linear-gradient(135deg, rgba(229,74,95,.06), rgba(241,148,124,.04));
+        border: 1px solid rgba(229,74,95,.15);
+        border-radius: 1rem;
+        padding: 1.2rem 1.5rem;
+        margin-bottom: 1.5rem;
+        display: flex; align-items: center; gap: 1rem;
+    }
+    .boycott-context-icon {
+        width: 50px; height: 50px; border-radius: .8rem;
+        background: linear-gradient(135deg, #E54A5F, #F1947C);
+        display: grid; place-items: center;
+        color: #fff; font-size: 1.3rem; flex-shrink: 0;
+    }
+    .boycott-context h5 { margin: 0 0 .15rem; font-size: .95rem; font-weight: 700; color: #2A3638; }
+    .boycott-context small { color: #94a3b8; font-size: .78rem; }
+
+    .alt-card {
+        background: #fff; border-radius: 1.2rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,.06);
+        overflow: hidden;
+    }
+    .alt-card-header {
+        background: linear-gradient(135deg, #2A3638, #4a6264);
+        padding: 1.8rem 2rem; color: #fff;
+    }
+    .alt-card-header h2 {
+        font-size: 1.3rem; font-weight: 800;
+        margin: 0 0 .3rem;
+        display: flex; align-items: center; gap: .5rem;
+    }
+    .alt-card-header p { font-size: .82rem; opacity: .8; margin: 0; }
+    .alt-card-body { padding: 2rem; }
+
+    .form-group { margin-bottom: 1.3rem; }
+    .form-group label {
+        font-size: .82rem; font-weight: 700; color: #2A3638;
+        margin-bottom: .4rem;
+        display: flex; align-items: center; gap: .3rem;
+    }
+    .form-group label i { color: #91B893; font-size: .75rem; }
+    .form-group .form-control,
+    .form-group select {
+        border: 2px solid #e8dfd3; border-radius: .7rem;
+        padding: .65rem 1rem; font-size: .88rem;
+        font-family: 'Inter', sans-serif;
+        transition: all .3s ease; width: 100%;
+    }
+    .form-group .form-control:focus,
+    .form-group select:focus {
+        border-color: #91B893;
+        box-shadow: 0 0 0 4px rgba(145,184,147,.12);
+        outline: none;
+    }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .form-row-3 { grid-template-columns: 1fr 1fr 1fr; }
+    @media (max-width: 576px) { .form-row, .form-row-3 { grid-template-columns: 1fr; } }
+
+    .forsale-toggle {
+        background: linear-gradient(135deg, rgba(145,184,147,.08), rgba(145,184,147,.04));
+        border: 2px solid rgba(145,184,147,.3);
+        border-radius: .9rem;
+        padding: 1.1rem 1.3rem;
+        margin-bottom: 1.3rem;
+    }
+    .forsale-toggle-inner {
+        display: flex; align-items: center; gap: 1rem;
+    }
+    .forsale-icon {
+        width: 42px; height: 42px; flex-shrink: 0;
+        border-radius: .7rem;
+        background: linear-gradient(135deg, #91B893, #7aa67c);
+        display: grid; place-items: center;
+        color: #fff; font-size: 1.15rem;
+    }
+    .forsale-text { flex: 1; }
+    .forsale-text strong { display: block; font-size: .88rem; color: #2A3638; margin-bottom: .2rem; }
+    .forsale-text small { font-size: .78rem; color: #64748b; line-height: 1.4; }
+    .forsale-switch { position: relative; display: inline-block; width: 48px; height: 26px; flex-shrink: 0; cursor: pointer; margin: 0; }
+    .forsale-input { opacity: 0; width: 0; height: 0; position: absolute; }
+    .forsale-slider {
+        position: absolute; inset: 0;
+        background: #d1d5db; border-radius: 26px;
+        transition: .3s;
+    }
+    .forsale-slider:before {
+        content: ''; position: absolute;
+        width: 20px; height: 20px;
+        left: 3px; bottom: 3px;
+        background: #fff; border-radius: 50%;
+        transition: .3s;
+        box-shadow: 0 1px 4px rgba(0,0,0,.2);
+    }
+    .forsale-input:checked + .forsale-slider { background: #91B893; }
+    .forsale-input:checked + .forsale-slider:before { transform: translateX(22px); }
+
+    .file-upload-zone {
+        border: 2px dashed #c1d5c2; border-radius: .8rem;
+        padding: 1.5rem; text-align: center;
+        transition: all .3s ease; cursor: pointer; background: #f7faf7;
+    }
+    .file-upload-zone:hover { border-color: #91B893; background: #eef5ef; }
+    .file-upload-zone i { font-size: 1.8rem; color: #91B893; margin-bottom: .5rem; }
+    .file-upload-zone p { font-size: .8rem; color: #94a3b8; margin: 0; }
+
+    .current-image {
+        display: flex; align-items: center; gap: .8rem;
+        background: #faf7f3; border-radius: .7rem;
+        padding: .7rem 1rem; margin-bottom: .7rem;
+    }
+    .current-image img { width: 48px; height: 48px; border-radius: .5rem; object-fit: cover; }
+    .current-image span { font-size: .8rem; color: #64748b; }
+
+    .status-badge {
+        display: inline-flex; align-items: center; gap: .4rem;
+        font-size: .75rem; font-weight: 700;
+        padding: .3rem .8rem; border-radius: 999px; color: #fff;
+        margin-left: .5rem;
+    }
+
+    .btn-submit-alt {
+        background: linear-gradient(135deg, #2A3638, #4a6264);
+        color: #fff; border: none;
+        padding: .75rem 2rem; border-radius: .7rem;
+        font-weight: 700; font-size: .9rem;
+        cursor: pointer; transition: all .3s ease;
+        display: inline-flex; align-items: center; gap: .5rem;
+        box-shadow: 0 4px 15px rgba(42,54,56,.25);
+    }
+    .btn-submit-alt:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(42,54,56,.35);
+        color: #fff;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+    <div class="alt-wrapper">
+        <a href="{{ path('app_boycott_show', {id: boycott.id}) }}" class="back-link">
+            <i class="bi bi-arrow-left"></i> {{ 'boycott.back_to_boycott'|trans }}
+        </a>
+
+        {% for type, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="alert alert-{{ type == 'success' ? 'success' : 'danger' }} alert-dismissible fade show" style="border-radius:.8rem;border:none;box-shadow:0 4px 15px rgba(0,0,0,.08)">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endfor %}
+
+        {# Context: which boycott #}
+        <div class="boycott-context">
+            <div class="boycott-context-icon"><i class="bi bi-ban"></i></div>
+            <div>
+                <h5>{{ boycott.name }} — {{ boycott.brand }}</h5>
+                <small>
+                    {{ 'boycott.editing_alt'|trans }}
+                    <span class="status-badge" style="background:{{ alternative.statusColor }}">{{ alternative.statusLabel }}</span>
+                </small>
+            </div>
+        </div>
+
+        <div class="alt-card">
+            <div class="alt-card-header">
+                <h2><i class="bi bi-pencil-square"></i> {{ 'boycott.edit_alt_title'|trans }}</h2>
+                <p>{{ 'boycott.you_are_editing'|trans }} <strong>{{ alternative.name }}</strong>{% if alternative.isApproved() %} — {{ 'boycott.changes_reflected'|trans }}{% endif %}</p>
+            </div>
+            <div class="alt-card-body">
+
+                {{ form_start(form, {'attr': {'class': 'alt-form', 'enctype': 'multipart/form-data'}}) }}
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>{{ 'boycott.alt_name'|trans }}</label>
+                            {{ form_widget(form.name, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(form.name) }}
+                        </div>
+                        <div class="form-group">
+                            <label>{{ 'boycott.brand'|trans }}</label>
+                            {{ form_widget(form.brand, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(form.brand) }}
+                        </div>
+                    </div>
+
+                    <div class="form-row form-row-3">
+                        <div class="form-group" id="price-row">
+                            <label>{{ 'boycott.price'|trans }}</label>
+                            {{ form_widget(form.price, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(form.price) }}
+                        </div>
+                        <div class="form-group">
+                            <label>{{ 'boycott.quality'|trans }}</label>
+                            {{ form_widget(form.qualityRating, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(form.qualityRating) }}
+                        </div>
+                        <div class="form-group">
+                            <label>{{ 'boycott.origin'|trans }}</label>
+                            {{ form_widget(form.origin, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(form.origin) }}
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>{{ 'boycott.description'|trans }} {{ 'boycott.optional'|trans }}</label>
+                        {{ form_widget(form.description, {'attr': {'class': 'form-control', 'rows': 3}}) }}
+                        {{ form_errors(form.description) }}
+                    </div>
+
+                    <div class="form-group">
+                        <label>{{ 'boycott.image'|trans }}</label>
+                        {% if alternative.image %}
+                            <div class="current-image">
+                                <img src="{{ asset('uploads/boycott/' ~ alternative.image) }}" alt="{{ alternative.name }}">
+                                <span>{{ 'boycott.current_image'|trans }} <strong>{{ alternative.image }}</strong></span>
+                            </div>
+                        {% endif %}
+                        <div class="file-upload-zone" onclick="document.getElementById('edit_alt_image_input').click()">
+                            <i class="bi bi-cloud-arrow-up d-block"></i>
+                            <p id="alt-file-label">{{ alternative.image ? 'boycott.click_replace_image'|trans : 'boycott.click_add_image'|trans }}</p>
+                            {% set click_replace_label = 'boycott.click_replace_image'|trans %}
+                            {{ form_widget(form.imageFile, {'id': 'edit_alt_image_input', 'attr': {'style': 'display:none', 'accept': 'image/jpeg,image/png,image/webp', 'onchange': "document.getElementById('alt-file-label').textContent = this.files[0] ? this.files[0].name : '" ~ click_replace_label ~ "'"}}) }}
+                        </div>
+                        {{ form_errors(form.imageFile) }}
+                    </div>
+
+                    <div class="forsale-toggle">
+                        <div class="forsale-toggle-inner">
+                            <div class="forsale-icon">
+                                <i class="bi bi-bag-check-fill"></i>
+                            </div>
+                            <div class="forsale-text">
+                                <strong>{{ 'boycott.for_sale'|trans }}</strong>
+                                <small>
+                                    {% if alternative.product %}
+                                        {{ 'boycott.currently_for_sale'|trans }}. {{ 'boycott.deactivate_removes'|trans }}
+                                    {% else %}
+                                        {{ 'boycott.currently_info_only'|trans }}. {{ 'boycott.activate_creates'|trans }}
+                                    {% endif %}
+                                </small>
+                            </div>
+                            <label class="forsale-switch">
+                                <input type="checkbox"
+                                       class="forsale-input"
+                                       id="forsale_toggle"
+                                       name="{{ form.forSale.vars.full_name }}"
+                                       value="1"
+                                       {{ form.forSale.vars.checked ? 'checked' : '' }}>
+                                <span class="forsale-slider"></span>
+                            </label>
+                        </div>
+                        {{ form_errors(form.forSale) }}
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mt-4">
+                        <a href="{{ path('app_boycott_show', {id: boycott.id}) }}" class="text-decoration-none" style="color:#94a3b8;font-size:.85rem">
+                            <i class="bi bi-x-lg me-1"></i> {{ 'boycott.cancel'|trans }}
+                        </a>
+                        <button type="submit" class="btn-submit-alt">
+                            <i class="bi bi-check-lg"></i> {{ 'boycott.save_changes'|trans }}
+                        </button>
+                    </div>
+
+                {{ form_end(form) }}
+            </div>
+        </div>
+
+<script>
+(function () {
+    var toggle   = document.getElementById('forsale_toggle');
+    var priceRow = document.getElementById('price-row');
+    if (!toggle || !priceRow) return;
+    function syncPrice() {
+        priceRow.style.display = toggle.checked ? '' : 'none';
+        if (!toggle.checked) {
+            var input = priceRow.querySelector('input');
+            if (input) input.value = '';
+        }
+    }
+    toggle.addEventListener('change', syncPrice);
+    syncPrice();
+})();
+</script>
+    </div>
+{% endblock %}

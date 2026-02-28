@@ -1,0 +1,17 @@
+{
+    "name": "L'Alternative",
+    "short_name": "L'Alternative",
+    "description": "Découvrez des alternatives locales aux produits boycottés",
+    "icons": [
+        {
+            "src": "/favicon.svg",
+            "sizes": "any",
+            "type": "image/svg+xml",
+            "purpose": "any maskable"
+        }
+    ],
+    "theme_color": "#91B893",
+    "background_color": "#FAF6F1",
+    "display": "standalone",
+    "start_url": "/"
+}

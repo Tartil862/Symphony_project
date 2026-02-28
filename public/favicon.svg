@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600">
+  <!-- Black stripe -->
+  <rect width="900" height="200" y="0"   fill="#000000"/>
+  <!-- White stripe -->
+  <rect width="900" height="200" y="200" fill="#FFFFFF"/>
+  <!-- Green stripe -->
+  <rect width="900" height="200" y="400" fill="#007A3D"/>
+  <!-- Red triangle -->
+  <polygon points="0,0 450,300 0,600" fill="#CE1126"/>
+</svg>

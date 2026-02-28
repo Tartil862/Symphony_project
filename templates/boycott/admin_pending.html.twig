@@ -1,0 +1,364 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'boycott.moderation_pending'|trans }}{% endblock %}
+{% block page_title %}🛡️ {{ 'boycott.moderation_title'|trans }}{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .back-link {
+        display: inline-flex; align-items: center; gap: .5rem;
+        text-decoration: none; color: #91B893; font-weight: 600;
+        font-size: .85rem; margin-bottom: 1.5rem;
+        transition: all .3s ease;
+    }
+    .back-link:hover { color: #5e8960; transform: translateX(-4px); }
+
+    .admin-header {
+        background: linear-gradient(135deg, #2A3638, #4a6264);
+        border-radius: 1.1rem;
+        padding: 1.8rem 2rem;
+        color: #fff;
+        margin-bottom: 2rem;
+        display: flex; justify-content: space-between; align-items: center;
+        flex-wrap: wrap; gap: 1rem;
+    }
+    .admin-header h2 {
+        font-size: 1.4rem; font-weight: 800;
+        margin: 0; display: flex; align-items: center; gap: .5rem;
+    }
+    .admin-header .badge-count {
+        background: #E54A5F;
+        color: #fff;
+        font-size: .85rem; font-weight: 800;
+        padding: .3rem .8rem;
+        border-radius: 999px;
+    }
+
+    .pending-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+        gap: 1.3rem;
+    }
+
+    .pending-card {
+        background: #fff;
+        border-radius: 1.1rem;
+        overflow: hidden;
+        box-shadow: 0 2px 12px rgba(0,0,0,.05);
+        border-left: 4px solid #F1947C;
+        transition: all .4s cubic-bezier(.4,0,.2,1);
+    }
+    .pending-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 35px rgba(42,54,56,.1);
+    }
+
+    .pending-card-top {
+        display: flex; gap: 1rem;
+        padding: 1.3rem 1.3rem 0;
+    }
+    .pending-card-img {
+        width: 60px; height: 60px;
+        border-radius: .7rem;
+        object-fit: cover;
+        border: 2px solid #f1ece5;
+        flex-shrink: 0;
+    }
+    .pending-card-img-placeholder {
+        width: 60px; height: 60px;
+        border-radius: .7rem;
+        background: #f5f0ea;
+        display: grid; place-items: center;
+        color: #d4c5b0; font-size: 1.3rem;
+        flex-shrink: 0;
+    }
+    .pending-card-info h4 {
+        font-size: 1rem; font-weight: 700;
+        color: #2A3638; margin: 0 0 .2rem;
+    }
+    .pending-card-info .brand {
+        font-size: .75rem; font-weight: 600;
+        color: #E54A5F; text-transform: uppercase;
+        letter-spacing: .03em;
+    }
+    .pending-card-tags {
+        display: flex; gap: .3rem; margin-top: .4rem;
+    }
+    .pending-card-tags .tag {
+        font-size: .6rem; font-weight: 700;
+        padding: .2rem .5rem; border-radius: 999px;
+        color: #fff; text-transform: uppercase;
+    }
+
+    .pending-card-body {
+        padding: 1rem 1.3rem;
+    }
+    .pending-card-body p {
+        font-size: .82rem; color: #64748b;
+        line-height: 1.5;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    .pending-card-meta {
+        font-size: .72rem; color: #94a3b8;
+        display: flex; align-items: center; gap: .5rem;
+        margin-top: .5rem;
+    }
+    .pending-card-meta i { color: #91B893; }
+
+    .pending-card-actions {
+        display: flex; gap: .5rem;
+        padding: 0 1.3rem 1.3rem;
+    }
+    .btn-approve {
+        flex: 1;
+        background: linear-gradient(135deg, #91B893, #7aa67c);
+        color: #fff;
+        border: none;
+        padding: .55rem 1rem;
+        border-radius: .6rem;
+        font-weight: 700;
+        font-size: .8rem;
+        cursor: pointer;
+        transition: all .3s ease;
+        display: flex; align-items: center; justify-content: center; gap: .3rem;
+    }
+    .btn-approve:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(145,184,147,.3); color: #fff; }
+    .btn-reject {
+        flex: 1;
+        background: #f5f0ea;
+        color: #E54A5F;
+        border: 2px solid rgba(229,74,95,.2);
+        padding: .55rem 1rem;
+        border-radius: .6rem;
+        font-weight: 700;
+        font-size: .8rem;
+        cursor: pointer;
+        transition: all .3s ease;
+        display: flex; align-items: center; justify-content: center; gap: .3rem;
+    }
+    .btn-reject:hover { background: #fef2f2; border-color: #E54A5F; }
+    .btn-delete-admin {
+        background: none;
+        color: #c93d4f;
+        border: none;
+        padding: .55rem;
+        border-radius: .6rem;
+        font-size: .85rem;
+        cursor: pointer;
+        transition: all .2s ease;
+    }
+    .btn-delete-admin:hover { background: #fef2f2; }
+
+    .empty-state {
+        text-align: center; padding: 4rem 2rem;
+    }
+    .empty-state i { font-size: 4rem; color: #91B893; margin-bottom: 1rem; }
+    .empty-state h4 { color: #2A3638; font-weight: 700; }
+    .empty-state p { color: #94a3b8; }
+</style>
+{% endblock %}
+
+{% block body %}
+    <a href="{{ path('app_boycott_index') }}" class="back-link">
+        <i class="bi bi-arrow-left"></i> {{ 'boycott.back_to_list'|trans }}
+    </a>
+
+    {# Flash messages #}
+    {% for type, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ type == 'success' ? 'success' : (type == 'danger' ? 'danger' : 'info') }} alert-dismissible fade show" style="border-radius:.8rem;border:none;box-shadow:0 4px 15px rgba(0,0,0,.08)">
+                <i class="bi bi-{{ type == 'success' ? 'check-circle-fill' : 'exclamation-triangle-fill' }} me-1"></i>
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    <div class="admin-header">
+        <h2>
+            <i class="bi bi-shield-check"></i>
+            {{ 'boycott.moderation_pending'|trans }}
+            <span class="badge-count">{{ pending|length + pendingAlternatives|length }}</span>
+        </h2>
+        <div style="display:flex;gap:.7rem;flex-wrap:wrap">
+            <span style="font-size:.8rem;color:rgba(255,255,255,.7)">
+                <i class="bi bi-ban me-1"></i> {{ pending|length }} boycott{{ pending|length > 1 ? 's' : '' }}
+            </span>
+            <span style="font-size:.8rem;color:rgba(255,255,255,.7)">
+                <i class="bi bi-arrow-repeat me-1"></i> {{ pendingAlternatives|length }} alternative{{ pendingAlternatives|length > 1 ? 's' : '' }}
+            </span>
+        </div>
+    </div>
+
+    {# ─── Section 1: Boycott products ─── #}
+    <h5 style="font-weight:800;color:#2A3638;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem">
+        <i class="bi bi-ban" style="color:#E54A5F"></i> {{ 'boycott.boycotts_pending'|trans }}
+        <span style="background:#E54A5F;color:#fff;font-size:.7rem;font-weight:800;padding:.2rem .6rem;border-radius:999px">{{ pending|length }}</span>
+    </h5>
+
+    {% if pending is empty %}
+        <div class="empty-state">
+            <i class="bi bi-check-circle"></i>
+            <h4>{{ 'boycott.no_boycotts_pending'|trans }}</h4>
+            <p>{{ 'boycott.all_boycotts_handled'|trans }}</p>
+        </div>
+    {% else %}
+        <div class="pending-grid">
+            {% for boycott in pending %}
+                <div class="pending-card">
+                    <div class="pending-card-top">
+                        {% if boycott.image %}
+                            <img src="{{ asset('uploads/boycott/' ~ boycott.image) }}" class="pending-card-img" alt="{{ boycott.name }}">
+                        {% else %}
+                            <div class="pending-card-img-placeholder"><i class="bi bi-ban"></i></div>
+                        {% endif %}
+                        <div class="pending-card-info">
+                            <h4>{{ boycott.name }}</h4>
+                            <div class="brand">{{ boycott.brand }}</div>
+                            <div class="pending-card-tags">
+                                <span class="tag" style="background:{{ boycott.reasonColor }}">{{ boycott.reasonLabel }}</span>
+                                <span class="tag" style="background:#2A3638">{{ boycott.levelLabel }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pending-card-body">
+                        <p>{{ boycott.description }}</p>
+                        <div class="pending-card-meta">
+                            <i class="bi bi-person"></i>
+                            {{ boycott.submittedBy ? boycott.submittedBy.email : 'boycott.anonymous'|trans }}
+                            <span>·</span>
+                            <i class="bi bi-calendar3"></i>
+                            {{ boycott.createdAt|date('d/m/Y H:i') }}
+                        </div>
+                    </div>
+                    <div class="pending-card-actions">
+                        <form method="post" action="{{ path('app_boycott_admin_approve', {id: boycott.id}) }}" style="flex:1;display:flex">
+                            <button type="submit" class="btn-approve" style="flex:1" data-confirm="{{ 'boycott.approve'|trans }} ?">
+                                <i class="bi bi-check-lg"></i> {{ 'boycott.approve'|trans }}
+                            </button>
+                        </form>
+                        <form method="post" action="{{ path('app_boycott_admin_reject', {id: boycott.id}) }}" style="flex:1;display:flex">
+                            <button type="submit" class="btn-reject" style="flex:1" data-confirm="{{ 'boycott.reject'|trans }} ?">
+                                <i class="bi bi-x-lg"></i> {{ 'boycott.reject'|trans }}
+                            </button>
+                        </form>
+                        <a href="{{ path('app_boycott_admin_edit', {id: boycott.id}) }}" class="btn-delete-admin" title="{{ 'common.edit'|trans }}" style="color:#91B893;display:grid;place-items:center">
+                            <i class="bi bi-pencil-square"></i>
+                        </a>
+                        <form method="post" action="{{ path('app_boycott_admin_delete', {id: boycott.id}) }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ boycott.id) }}">
+                            <button type="submit" class="btn-delete-admin" data-confirm="{{ 'boycott.confirm_delete_boycott'|trans }}" title="{{ 'common.delete'|trans }}">
+                                <i class="bi bi-trash3"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {# ─── Section 2: Pending alternatives ─── #}
+    <h5 style="font-weight:800;color:#2A3638;margin:2.5rem 0 1rem;display:flex;align-items:center;gap:.5rem">
+        <i class="bi bi-arrow-repeat" style="color:#91B893"></i> {{ 'boycott.alts_pending'|trans }}
+        <span style="background:#91B893;color:#fff;font-size:.7rem;font-weight:800;padding:.2rem .6rem;border-radius:999px">{{ pendingAlternatives|length }}</span>
+    </h5>
+
+    {% if pendingAlternatives is empty %}
+        <div class="empty-state">
+            <i class="bi bi-arrow-repeat"></i>
+            <h4>{{ 'boycott.no_alts_pending'|trans }}</h4>
+            <p>{{ 'boycott.all_alts_handled'|trans }}</p>
+        </div>
+    {% else %}
+        <div class="pending-grid">
+            {% for alt in pendingAlternatives %}
+                <div class="pending-card" style="border-left-color:#91B893">
+                    <div class="pending-card-top">
+                        {% if alt.image %}
+                            <img src="{{ asset('uploads/boycott/' ~ alt.image) }}" class="pending-card-img" alt="{{ alt.name }}">
+                        {% else %}
+                            <div class="pending-card-img-placeholder"><i class="bi bi-box-seam"></i></div>
+                        {% endif %}
+                        <div class="pending-card-info">
+                            <h4>{{ alt.name }}</h4>
+                            <div class="brand">{{ alt.brand }}</div>
+                            <div class="pending-card-tags">
+                                <span class="tag" style="background:#91B893">{{ 'product.alt_badge'|trans }}</span>
+                                {% if alt.price %}
+                                    <span class="tag" style="background:#E5C6A4;color:#2A3638">{{ alt.price|number_format(2, ',', ' ') }} DT</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pending-card-body">
+                        {# Which boycott it's for #}
+                        <div style="font-size:.72rem;color:#E54A5F;font-weight:600;margin-bottom:.4rem">
+                            <i class="bi bi-ban me-1"></i>
+                            {{ 'boycott.alt_for'|trans }}
+                            <strong>{{ alt.boycottProduct.name }}</strong>
+                        </div>
+
+                        {# Quality + origin #}
+                        <div style="display:flex;gap:1rem;align-items:center;margin-bottom:.4rem">
+                            <span style="color:#e6a817;font-size:.85rem">{{ alt.qualityStars|raw }}</span>
+                            {% if alt.origin %}
+                                <span style="font-size:.75rem;color:#64748b"><i class="bi bi-geo-alt" style="color:#91B893"></i> {{ alt.origin }}</span>
+                            {% endif %}
+                        </div>
+
+                        <p>{{ alt.description }}</p>
+
+                        <div class="pending-card-meta">
+                            <i class="bi bi-person"></i>
+                            {{ alt.suggestedBy ? alt.suggestedBy.email : 'boycott.anonymous'|trans }}
+                            <span>·</span>
+                            <i class="bi bi-calendar3"></i>
+                            {{ alt.createdAt|date('d/m/Y H:i') }}
+                        </div>
+                    </div>
+
+                    <div class="pending-card-actions">
+                        <form method="post" action="{{ path('app_boycott_admin_approve_alternative', {id: alt.id}) }}" style="flex:1;display:flex">
+                            <button type="submit" class="btn-approve" style="flex:1" data-confirm="{{ 'boycott.approve'|trans }} ?">
+                                <i class="bi bi-check-lg"></i> {{ 'boycott.approve'|trans }}
+                            </button>
+                        </form>
+                        <form method="post" action="{{ path('app_boycott_admin_reject_alternative', {id: alt.id}) }}" style="flex:1;display:flex">
+                            <button type="submit" class="btn-reject" style="flex:1" data-confirm="{{ 'boycott.reject'|trans }} ?">
+                                <i class="bi bi-x-lg"></i> {{ 'boycott.reject'|trans }}
+                            </button>
+                        </form>
+                        <a href="{{ path('app_boycott_show_alternative', {id: alt.id}) }}" class="btn-delete-admin" title="{{ 'boycott.details'|trans }}" style="color:#2A3638;display:grid;place-items:center">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                        <a href="{{ path('app_boycott_admin_edit_alternative', {id: alt.id}) }}" class="btn-delete-admin" title="{{ 'common.edit'|trans }}" style="color:#91B893;display:grid;place-items:center">
+                            <i class="bi bi-pencil-square"></i>
+                        </a>
+                        <form method="post" action="{{ path('app_boycott_admin_delete_alternative', {id: alt.id}) }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete-alt-' ~ alt.id) }}">
+                            <button type="submit" class="btn-delete-admin" data-confirm="{{ 'boycott.confirm_delete_alt'|trans }}" title="{{ 'common.delete'|trans }}">
+                                <i class="bi bi-trash3"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    document.querySelectorAll('[data-confirm]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            if (!confirm(btn.dataset.confirm)) {
+                e.preventDefault();
+            }
+        });
+    });
+</script>
+{% endblock %}

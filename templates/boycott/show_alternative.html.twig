@@ -1,0 +1,411 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ alternative.name }} — Alternative{% endblock %}
+{% block page_title %}{{ alternative.name }}{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .back-link {
+        display: inline-flex; align-items: center; gap: .5rem;
+        text-decoration: none; color: #91B893; font-weight: 600;
+        font-size: .85rem; margin-bottom: 1.5rem;
+        transition: all .3s ease;
+    }
+    .back-link:hover { color: #5e8960; transform: translateX(-4px); }
+
+    .alt-detail-card {
+        background: #fff;
+        border-radius: 1.2rem;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0,0,0,.06);
+        margin-bottom: 2rem;
+    }
+
+    /* Hero */
+    .alt-hero {
+        position: relative;
+        height: 240px;
+        background: linear-gradient(135deg, #2A3638, #4a6264);
+        overflow: hidden;
+    }
+    .alt-hero img {
+        width: 100%; height: 100%;
+        object-fit: cover; opacity: .75;
+    }
+    .alt-hero-placeholder {
+        width: 100%; height: 100%;
+        display: grid; place-items: center;
+        color: rgba(255,255,255,.18); font-size: 6rem;
+    }
+    .alt-hero-overlay {
+        position: absolute;
+        bottom: 0; left: 0; right: 0;
+        padding: 1.8rem 2rem;
+        background: linear-gradient(transparent, rgba(42,54,56,.92));
+        color: #fff;
+    }
+    .alt-hero-overlay h1 {
+        font-size: 1.8rem; font-weight: 800; margin: 0 0 .3rem;
+    }
+    .alt-hero-overlay .brand-tag {
+        font-size: .85rem; font-weight: 600;
+        color: #91B893; text-transform: uppercase; letter-spacing: .05em;
+    }
+    .alt-hero-badges {
+        display: flex; gap: .5rem; margin-top: .6rem; flex-wrap: wrap;
+    }
+    .badge-pill {
+        font-size: .68rem; font-weight: 700;
+        padding: .3rem .75rem; border-radius: 999px;
+        color: #fff; text-transform: uppercase;
+    }
+
+    /* Body */
+    .alt-body { padding: 1.8rem 2rem 2rem; }
+
+    .alt-description {
+        font-size: .93rem; color: #475569;
+        line-height: 1.75; margin-bottom: 1.8rem;
+    }
+
+    /* Meta grid */
+    .alt-meta-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.8rem;
+    }
+    .meta-item {
+        background: #faf7f3;
+        padding: 1rem 1.1rem;
+        border-radius: .8rem;
+        display: flex; align-items: center; gap: .7rem;
+    }
+    .meta-item i { font-size: 1.3rem; color: #E54A5F; }
+    .meta-item span { font-size: .78rem; color: #64748b; }
+    .meta-item strong { display: block; color: #2A3638; font-size: .9rem; }
+
+    /* Stars */
+    .quality-stars { color: #e6a817; font-size: 1.1rem; letter-spacing: .1em; }
+
+    /* Vote */
+    .vote-section {
+        display: flex; align-items: center; gap: 1rem;
+        padding: 1rem 0;
+    }
+    .vote-btn-lg {
+        width: 46px; height: 46px;
+        border-radius: .8rem;
+        border: 2px solid #e8dfd3;
+        display: grid; place-items: center;
+        font-size: 1.1rem; cursor: pointer;
+        background: #fff; color: #64748b;
+        transition: all .25s ease;
+    }
+    .vote-btn-lg:hover { transform: scale(1.1); border-color: #c4b5a0; }
+    .vote-btn-lg.active-up { background: #dde8de; border-color: #91B893; color: #5e8960; }
+    .vote-btn-lg.active-down { background: #f9d4d8; border-color: #E54A5F; color: #c93d4f; }
+    .vote-score-lg { font-size: 1.6rem; font-weight: 900; color: #2A3638; }
+    .vote-label { font-size: .75rem; color: #94a3b8; }
+
+    /* Boycott context card */
+    .boycott-link-card {
+        background: linear-gradient(135deg, rgba(229,74,95,.05), rgba(241,148,124,.03));
+        border: 1px solid rgba(229,74,95,.15);
+        border-radius: 1rem;
+        padding: 1.2rem 1.5rem;
+        display: flex; align-items: center; gap: 1rem;
+        text-decoration: none;
+        transition: all .3s ease;
+        margin-bottom: 1.5rem;
+    }
+    .boycott-link-card:hover {
+        border-color: rgba(229,74,95,.35);
+        transform: translateX(4px);
+    }
+    .boycott-link-icon {
+        width: 48px; height: 48px; border-radius: .7rem;
+        background: linear-gradient(135deg, #E54A5F, #F1947C);
+        display: grid; place-items: center;
+        color: #fff; font-size: 1.2rem; flex-shrink: 0;
+    }
+    .boycott-link-card h5 {
+        margin: 0 0 .1rem; font-size: .95rem;
+        font-weight: 700; color: #2A3638;
+    }
+    .boycott-link-card small { color: #94a3b8; font-size: .78rem; }
+
+    /* Store product badge */
+    .product-card {
+        background: linear-gradient(135deg, rgba(145,184,147,.08), rgba(145,184,147,.04));
+        border: 1px solid rgba(145,184,147,.3);
+        border-radius: 1rem;
+        padding: 1.2rem 1.5rem;
+        display: flex; align-items: center; gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    .product-card-icon {
+        width: 48px; height: 48px; border-radius: .7rem;
+        background: linear-gradient(135deg, #91B893, #7aa67c);
+        display: grid; place-items: center;
+        color: #fff; font-size: 1.2rem; flex-shrink: 0;
+    }
+    .product-card h5 { margin: 0 0 .1rem; font-size: .95rem; font-weight: 700; color: #2A3638; }
+    .product-card small { color: #64748b; font-size: .78rem; }
+
+    /* Admin bar */
+    .admin-action-bar {
+        background: #f8f9fa;
+        border-top: 1px solid #f1ece5;
+        padding: 1rem 2rem;
+        display: flex; justify-content: flex-end; gap: .6rem;
+        flex-wrap: wrap;
+    }
+    .btn-admin-edit {
+        background: #f0faf0; color: #5e8960;
+        border: 1.5px solid rgba(145,184,147,.4);
+        padding: .45rem 1rem; border-radius: .6rem;
+        font-size: .82rem; font-weight: 700;
+        display: inline-flex; align-items: center; gap: .4rem;
+        text-decoration: none; transition: all .2s ease;
+    }
+    .btn-admin-edit:hover { background: #dde8de; color: #3d6640; }
+    .btn-admin-delete {
+        background: #fef2f2; color: #E54A5F;
+        border: 1.5px solid rgba(229,74,95,.3);
+        padding: .45rem 1rem; border-radius: .6rem;
+        font-size: .82rem; font-weight: 700;
+        cursor: pointer; transition: all .2s ease;
+        display: inline-flex; align-items: center; gap: .4rem;
+    }
+    .btn-admin-delete:hover { background: #fde8eb; }
+
+    .btn-approve {
+        background: linear-gradient(135deg, #91B893, #7aa67c);
+        color: #fff; border: none;
+        padding: .45rem 1rem; border-radius: .6rem;
+        font-size: .82rem; font-weight: 700;
+        cursor: pointer; transition: all .2s ease;
+        display: inline-flex; align-items: center; gap: .4rem;
+    }
+    .btn-approve:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(145,184,147,.3); }
+    .btn-reject {
+        background: #f5f0ea; color: #E54A5F;
+        border: 2px solid rgba(229,74,95,.2);
+        padding: .45rem 1rem; border-radius: .6rem;
+        font-size: .82rem; font-weight: 700;
+        cursor: pointer; transition: all .2s ease;
+        display: inline-flex; align-items: center; gap: .4rem;
+    }
+    .btn-reject:hover { background: #fef2f2; border-color: #E54A5F; }
+</style>
+{% endblock %}
+
+{% block body %}
+    <a href="{{ path('app_boycott_show', {id: boycott.id}) }}" class="back-link">
+        <i class="bi bi-arrow-left"></i> {{ 'boycott.return_to_alternatives'|trans }} {{ boycott.name }}
+    </a>
+
+    {% for type, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ type == 'success' ? 'success' : 'info' }} alert-dismissible fade show" style="border-radius:.8rem;border:none;box-shadow:0 4px 15px rgba(0,0,0,.08)">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    {# ─── Which boycott ─── #}
+    <a href="{{ path('app_boycott_show', {id: boycott.id}) }}" class="boycott-link-card">
+        <div class="boycott-link-icon"><i class="bi bi-ban"></i></div>
+        <div>
+            <h5>{{ boycott.name }} — {{ boycott.brand }}</h5>
+            <small>{{ 'boycott.alt_proposed_for'|trans }}</small>
+        </div>
+        <i class="bi bi-arrow-right ms-auto" style="color:#94a3b8"></i>
+    </a>
+
+    {# ─── Store product link ─── #}
+    {% if alternative.product %}
+        <div class="product-card">
+            <div class="product-card-icon"><i class="bi bi-bag-check"></i></div>
+            <div>
+                <h5>{{ 'boycott.available_in_store'|trans }}</h5>
+                <small>
+                    {{ 'boycott.stock_label'|trans }}
+                    {% if alternative.product.quantity > 0 %}
+                        <strong style="color:#5e8960">{{ 'dashboard.in_stock_count'|trans({'%count%': alternative.product.quantity}) }}</strong>
+                    {% else %}
+                        <strong style="color:#E54A5F">{{ 'product.out_of_stock'|trans }}</strong>
+                    {% endif %}
+                    &nbsp;·&nbsp; {{ 'boycott.price_label'|trans }} <strong>{{ alternative.product.price is not null ? (alternative.product.price|number_format(2, ',', ' ') ~ ' DT') : '—' }}</strong>
+                </small>
+            </div>
+            <a href="{{ path('app_product_show', {id: alternative.product.id}) }}" style="margin-left:auto;background:#91B893;color:#fff;padding:.4rem .9rem;border-radius:.6rem;font-size:.8rem;font-weight:700;text-decoration:none">
+                <i class="bi bi-eye me-1"></i> {{ 'boycott.view_product'|trans }}
+            </a>
+        </div>
+    {% endif %}
+
+    {# ─── Main card ─── #}
+    <div class="alt-detail-card">
+        <div class="alt-hero">
+            {% if alternative.image %}
+                <img src="{{ asset('uploads/boycott/' ~ alternative.image) }}" alt="{{ alternative.name }}">
+            {% else %}
+                <div class="alt-hero-placeholder"><i class="bi bi-box-seam"></i></div>
+            {% endif %}
+            <div class="alt-hero-overlay">
+                <div class="brand-tag">{{ alternative.brand }}</div>
+                <h1>{{ alternative.name }}</h1>
+                <div class="alt-hero-badges">
+                    {# Status #}
+                    <span class="badge-pill" style="background:{{ alternative.statusColor }}">
+                        {{ alternative.statusLabel }}
+                    </span>
+                    {# Price #}
+                    {% if alternative.price %}
+                        <span class="badge-pill" style="background:#2A3638">
+                            {{ alternative.price|number_format(2, ',', ' ') }} DT
+                        </span>
+                    {% endif %}
+                    {# Origin #}
+                    {% if alternative.origin %}
+                        <span class="badge-pill" style="background:rgba(255,255,255,.15)">
+                            <i class="bi bi-geo-alt me-1"></i>{{ alternative.origin }}
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="alt-body">
+            {% if alternative.description %}
+                <p class="alt-description">{{ alternative.description }}</p>
+            {% endif %}
+
+            {# Meta grid #}
+            <div class="alt-meta-grid">
+                <div class="meta-item">
+                    <i class="bi bi-currency-exchange" style="color:#91B893"></i>
+                    <div>
+                        <span>{{ 'boycott.price_label'|trans }}</span>
+                        <strong>{{ alternative.price ? (alternative.price|number_format(2, ',', ' ') ~ ' DT') : '—' }}</strong>
+                    </div>
+                </div>
+                <div class="meta-item">
+                    <i class="bi bi-star-fill" style="color:#e6a817"></i>
+                    <div>
+                        <span>{{ 'boycott.quality_label'|trans }}</span>
+                        <strong><span class="quality-stars">{{ alternative.qualityStars|raw }}</span></strong>
+                    </div>
+                </div>
+                <div class="meta-item">
+                    <i class="bi bi-geo-alt" style="color:#91B893"></i>
+                    <div>
+                        <span>{{ 'boycott.origin_label'|trans }}</span>
+                        <strong>{{ alternative.origin ?? '—' }}</strong>
+                    </div>
+                </div>
+                <div class="meta-item">
+                    <i class="bi bi-person-circle" style="color:#2A3638"></i>
+                    <div>
+                        <span>{{ 'boycott.proposer_label'|trans }}</span>
+                        <strong>{{ alternative.suggestedBy ? alternative.suggestedBy.email|split('@')[0] : 'Anonyme' }}</strong>
+                    </div>
+                </div>
+                <div class="meta-item">
+                    <i class="bi bi-calendar3" style="color:#94a3b8"></i>
+                    <div>
+                        <span>{{ 'boycott.date_label'|trans }}</span>
+                        <strong>{{ alternative.createdAt|date('d/m/Y') }}</strong>
+                    </div>
+                </div>
+                <div class="meta-item">
+                    <i class="bi bi-graph-up-arrow" style="color:#E54A5F"></i>
+                    <div>
+                        <span>{{ 'boycott.community_score'|trans }}</span>
+                        <strong>{{ alternative.voteScore }} {{ 'boycott.pts'|trans }}</strong>
+                    </div>
+                </div>
+            </div>
+
+            {# Vote widget #}
+            {% if is_granted('ROLE_USER') %}
+                <div class="vote-section" data-type="alternative" data-id="{{ alternative.id }}">
+                    <button class="vote-btn-lg vote-up {{ userVote == 1 ? 'active-up' : '' }}" data-value="1" title="Utile">
+                        <i class="bi bi-hand-thumbs-up-fill"></i>
+                    </button>
+                    <div style="text-align:center">
+                        <div class="vote-score-lg vote-score">{{ alternative.voteScore }}</div>
+                        <div class="vote-label">points</div>
+                    </div>
+                    <button class="vote-btn-lg vote-down {{ userVote == -1 ? 'active-down' : '' }}" data-value="-1" title="Inutile">
+                        <i class="bi bi-hand-thumbs-down-fill"></i>
+                    </button>
+                    <span style="font-size:.8rem;color:#94a3b8;margin-left:.5rem">{{ 'boycott.vote_for_alt'|trans }}</span>
+                </div>
+            {% endif %}
+        </div>
+
+        {# Admin action bar #}
+        {% if is_granted('ROLE_ADMIN') %}
+            <div class="admin-action-bar">
+                {% if alternative.isPending() %}
+                    <form method="post" action="{{ path('app_boycott_admin_approve_alternative', {id: alternative.id}) }}" style="display:inline">
+                        <button type="submit" class="btn-approve" data-confirm="{{ 'boycott.approve'|trans }} ?">
+                            <i class="bi bi-check-lg"></i> {{ 'boycott.approve'|trans }}
+                        </button>
+                    </form>
+                    <form method="post" action="{{ path('app_boycott_admin_reject_alternative', {id: alternative.id}) }}" style="display:inline">
+                        <button type="submit" class="btn-reject" data-confirm="{{ 'boycott.reject'|trans }} ?">
+                            <i class="bi bi-x-lg"></i> {{ 'boycott.reject'|trans }}
+                        </button>
+                    </form>
+                {% endif %}
+                <a href="{{ path('app_boycott_admin_edit_alternative', {id: alternative.id}) }}" class="btn-admin-edit">
+                    <i class="bi bi-pencil-square"></i> {{ 'boycott.edit'|trans }}
+                </a>
+                <form method="post" action="{{ path('app_boycott_admin_delete_alternative', {id: alternative.id}) }}" style="display:inline">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete-alt-' ~ alternative.id) }}">
+                    <button type="submit" class="btn-admin-delete" data-confirm="{{ 'boycott.delete'|trans }} ?">
+                        <i class="bi bi-trash3"></i> {{ 'boycott.delete'|trans }}
+                    </button>
+                </form>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    document.querySelectorAll('[data-confirm]').forEach(btn => {
+        btn.addEventListener('click', e => {
+            if (!confirm(btn.dataset.confirm)) e.preventDefault();
+        });
+    });
+
+    const voteWidget = document.querySelector('.vote-section');
+    if (voteWidget) {
+        voteWidget.querySelectorAll('.vote-btn-lg').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const value = parseInt(btn.dataset.value);
+                try {
+                    const res = await fetch('{{ path("app_boycott_vote") }}', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ type: 'alternative', targetId: '{{ alternative.id }}', value })
+                    });
+                    const data = await res.json();
+                    if (data.score !== undefined) {
+                        voteWidget.querySelector('.vote-score').textContent = data.score;
+                        voteWidget.querySelectorAll('.vote-btn-lg').forEach(b => b.classList.remove('active-up', 'active-down'));
+                        if (data.userVote === 1) voteWidget.querySelector('[data-value="1"]').classList.add('active-up');
+                        if (data.userVote === -1) voteWidget.querySelector('[data-value="-1"]').classList.add('active-down');
+                    }
+                } catch (e) { console.error(e); }
+            });
+        });
+    }
+</script>
+{% endblock %}

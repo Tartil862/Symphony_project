@@ -1,0 +1,183 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'boycott.edit_boycott'|trans }} — {{ boycott.name }}{% endblock %}
+{% block page_title %}{{ 'boycott.edit_boycott_page'|trans }}{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .suggest-wrapper {
+        max-width: 680px;
+        margin: 0 auto;
+    }
+    .back-link {
+        display: inline-flex; align-items: center; gap: .5rem;
+        text-decoration: none; color: #91B893; font-weight: 600;
+        font-size: .85rem; margin-bottom: 1.5rem;
+        transition: all .3s ease;
+    }
+    .back-link:hover { color: #5e8960; transform: translateX(-4px); }
+
+    .suggest-card {
+        background: #fff;
+        border-radius: 1.2rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,.06);
+        overflow: hidden;
+    }
+    .suggest-card-header {
+        background: linear-gradient(135deg, #2A3638, #4a6264);
+        padding: 1.8rem 2rem;
+        color: #fff;
+    }
+    .suggest-card-header h2 {
+        font-size: 1.3rem; font-weight: 800;
+        margin: 0 0 .3rem;
+        display: flex; align-items: center; gap: .5rem;
+    }
+    .suggest-card-header p { font-size: .82rem; opacity: .75; margin: 0; }
+    .suggest-card-body { padding: 2rem; }
+
+    .form-group { margin-bottom: 1.3rem; }
+    .form-group label {
+        font-size: .82rem; font-weight: 700; color: #2A3638;
+        margin-bottom: .4rem;
+        display: flex; align-items: center; gap: .3rem;
+    }
+    .form-group label i { color: #E54A5F; font-size: .75rem; }
+    .form-group .form-control,
+    .form-group select {
+        border: 2px solid #e8dfd3; border-radius: .7rem;
+        padding: .65rem 1rem; font-size: .88rem;
+        font-family: 'Inter', sans-serif;
+        transition: all .3s ease; width: 100%;
+    }
+    .form-group .form-control:focus,
+    .form-group select:focus {
+        border-color: #91B893;
+        box-shadow: 0 0 0 4px rgba(145,184,147,.12);
+        outline: none;
+    }
+    .form-group textarea.form-control { min-height: 120px; resize: vertical; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media (max-width: 576px) { .form-row { grid-template-columns: 1fr; } }
+
+    .file-upload-zone {
+        border: 2px dashed #d4c5b0; border-radius: .8rem;
+        padding: 1.5rem; text-align: center;
+        transition: all .3s ease; cursor: pointer; background: #fdfbf8;
+    }
+    .file-upload-zone:hover { border-color: #91B893; background: #f7faf7; }
+    .file-upload-zone i { font-size: 1.8rem; color: #d4c5b0; margin-bottom: .5rem; }
+    .file-upload-zone p { font-size: .8rem; color: #94a3b8; margin: 0; }
+
+    .current-image {
+        display: flex; align-items: center; gap: .8rem;
+        background: #faf7f3; border-radius: .7rem;
+        padding: .7rem 1rem; margin-bottom: .7rem;
+    }
+    .current-image img { width: 48px; height: 48px; border-radius: .5rem; object-fit: cover; }
+    .current-image span { font-size: .8rem; color: #64748b; }
+
+    .btn-submit-boycott {
+        background: linear-gradient(135deg, #2A3638, #4a6264);
+        color: #fff; border: none;
+        padding: .75rem 2rem; border-radius: .7rem;
+        font-weight: 700; font-size: .9rem;
+        cursor: pointer; transition: all .3s ease;
+        display: inline-flex; align-items: center; gap: .5rem;
+        box-shadow: 0 4px 15px rgba(42,54,56,.25);
+    }
+    .btn-submit-boycott:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(42,54,56,.35);
+        color: #fff;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+    <div class="suggest-wrapper">
+        <a href="{{ path('app_boycott_show', {id: boycott.id}) }}" class="back-link">
+            <i class="bi bi-arrow-left"></i> {{ 'boycott.back_to_boycott'|trans }}
+        </a>
+
+        {% for type, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="alert alert-{{ type == 'success' ? 'success' : 'danger' }} alert-dismissible fade show" style="border-radius:.8rem;border:none;box-shadow:0 4px 15px rgba(0,0,0,.08)">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endfor %}
+
+        <div class="suggest-card">
+            <div class="suggest-card-header">
+                <h2><i class="bi bi-pencil-square"></i> {{ 'boycott.edit_boycott'|trans }}</h2>
+                <p>{{ 'boycott.you_are_editing'|trans }} <strong>{{ boycott.name }}</strong> — {{ boycott.brand }}</p>
+            </div>
+            <div class="suggest-card-body">
+
+                {{ form_start(form, {'attr': {'class': 'boycott-form', 'enctype': 'multipart/form-data'}}) }}
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>{{ 'boycott.product_name'|trans }}</label>
+                            {{ form_widget(form.name, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(form.name) }}
+                        </div>
+                        <div class="form-group">
+                            <label>{{ 'boycott.brand'|trans }}</label>
+                            {{ form_widget(form.brand, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(form.brand) }}
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>{{ 'boycott.boycott_reason'|trans }}</label>
+                            {{ form_widget(form.reason, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(form.reason) }}
+                        </div>
+                        <div class="form-group">
+                            <label>{{ 'boycott.boycott_level'|trans }}</label>
+                            {{ form_widget(form.boycottLevel, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(form.boycottLevel) }}
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>{{ 'boycott.why_boycott'|trans }}</label>
+                        {{ form_widget(form.description, {'attr': {'class': 'form-control', 'rows': 5}}) }}
+                        {{ form_errors(form.description) }}
+                    </div>
+
+                    <div class="form-group">
+                        <label>{{ 'product.image'|trans }}</label>
+                        {% if boycott.image %}
+                            <div class="current-image">
+                                <img src="{{ asset('uploads/boycott/' ~ boycott.image) }}" alt="{{ boycott.name }}">
+                                <span>{{ 'boycott.current_image'|trans }} <strong>{{ boycott.image }}</strong></span>
+                            </div>
+                        {% endif %}
+                        <div class="file-upload-zone" onclick="document.getElementById('edit_boycott_image_input').click()">
+                            <i class="bi bi-cloud-arrow-up d-block"></i>
+                            <p id="file-label">{{ boycott.image ? 'boycott.click_replace_image'|trans : 'boycott.click_add_image'|trans }} (JPEG, PNG, WebP – max 2 Mo)</p>
+                            {% set click_replace_label = 'boycott.click_replace_image'|trans %}
+                            {{ form_widget(form.imageFile, {'id': 'edit_boycott_image_input', 'attr': {'style': 'display:none', 'accept': 'image/jpeg,image/png,image/webp', 'onchange': "document.getElementById('file-label').textContent = this.files[0] ? this.files[0].name : '" ~ click_replace_label ~ "'"}}) }}
+                        </div>
+                        {{ form_errors(form.imageFile) }}
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mt-4">
+                        <a href="{{ path('app_boycott_show', {id: boycott.id}) }}" class="text-decoration-none" style="color:#94a3b8;font-size:.85rem">
+                            <i class="bi bi-x-lg me-1"></i> {{ 'common.cancel'|trans }}
+                        </a>
+                        <button type="submit" class="btn-submit-boycott">
+                            <i class="bi bi-check-lg"></i> {{ 'boycott.save_changes'|trans }}
+                        </button>
+                    </div>
+
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}

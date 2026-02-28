@@ -1,0 +1,61 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'product.title'|trans }} – {{ product.label }}{% endblock %}
+
+{% block page_title %}{{ 'product.show'|trans }}{% endblock %}
+
+{% block body %}
+    <div class="mb-4">
+        <a href="{{ path('app_product_index') }}" class="btn btn-ghost">
+            <i class="bi bi-arrow-left me-1"></i> {{ 'product.back'|trans }}
+        </a>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span><i class="bi bi-bag me-2"></i>{{ product.label }}</span>
+            <div class="d-flex gap-2">
+                <a href="{{ path('app_product_edit', {'id': product.id}) }}" class="btn btn-outline-accent">
+                    <i class="bi bi-pencil me-1"></i> {{ 'product.edit'|trans }}
+                </a>
+                {{ include('product/_delete_form.html.twig') }}
+            </div>
+        </div>
+        <div class="card-body p-0">
+            {% if product.image %}
+                <div class="text-center p-4" style="background:linear-gradient(135deg,#f5f0ea,#efe8df)">
+                    <img src="{{ asset(product.imageFolder ~ '/' ~ product.image) }}" alt="{{ product.label }}" 
+                         style="max-width:320px;max-height:280px;object-fit:cover;border-radius:.75rem;box-shadow:0 8px 30px rgba(42,54,56,.15)">
+                </div>
+            {% endif %}
+            <table class="table detail-table mb-0">
+                <tbody>
+                    <tr>
+                        <th>ID</th>
+                        <td>{{ product.id }}</td>
+                    </tr>
+                    <tr>
+                        <th>{{ 'product.label'|trans }}</th>
+                        <td>{{ product.label }}</td>
+                    </tr>
+                    <tr>
+                        <th>{{ 'product.price'|trans }}</th>
+                        <td>{{ product.price is not null ? (product.price|number_format(2, '.', ',')) : '—' }} <small class="text-muted">{{ product.price is not null ? 'DT' : '' }}</small></td>
+                    </tr>
+                    <tr>
+                        <th>{{ 'product.stock'|trans }}</th>
+                        <td>
+                            {% if product.quantity <= 0 %}
+                                <span class="badge" style="background:#f9d4d8;color:#E54A5F;font-weight:700;font-size:.85rem">{{ 'product.out_of_stock'|trans }}</span>
+                            {% elseif product.quantity <= 5 %}
+                                <span class="badge" style="background:#fef3c7;color:#92400e;font-weight:700;font-size:.85rem">{{ product.quantity }} {{ 'product.low_stock_badge'|trans }}</span>
+                            {% else %}
+                                <span class="badge" style="background:#dde8de;color:#065f46;font-weight:700;font-size:.85rem">{{ product.quantity }} {{ 'product.in_stock_badge'|trans }}</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

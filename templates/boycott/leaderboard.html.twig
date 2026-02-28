@@ -1,0 +1,379 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'boycott.community_leaderboard'|trans }}{% endblock %}
+{% block page_title %}🏆 {{ 'boycott.community_leaderboard'|trans }}{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .back-link {
+        display: inline-flex; align-items: center; gap: .5rem;
+        text-decoration: none; color: #91B893; font-weight: 600;
+        font-size: .85rem; margin-bottom: 1.5rem;
+        transition: all .3s ease;
+    }
+    .back-link:hover { color: #5e8960; transform: translateX(-4px); }
+
+    .leaderboard-hero {
+        background: linear-gradient(135deg, #2A3638, #4a6264);
+        border-radius: 1.2rem;
+        padding: 2rem 2.5rem;
+        color: #fff;
+        margin-bottom: 2rem;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+    .leaderboard-hero::before {
+        content: '';
+        position: absolute;
+        top: -80px; right: -60px;
+        width: 250px; height: 250px;
+        background: rgba(229,198,164,.08);
+        border-radius: 50%;
+    }
+    .leaderboard-hero::after {
+        content: '';
+        position: absolute;
+        bottom: -60px; left: -40px;
+        width: 200px; height: 200px;
+        background: rgba(145,184,147,.08);
+        border-radius: 50%;
+    }
+    .leaderboard-hero h2 {
+        font-size: 1.6rem; font-weight: 800;
+        margin: 0 0 .3rem;
+        position: relative; z-index: 1;
+    }
+    .leaderboard-hero p {
+        font-size: .85rem; opacity: .75;
+        margin: 0;
+        position: relative; z-index: 1;
+    }
+
+    /* Podium top 3 */
+    .podium {
+        display: flex;
+        justify-content: center;
+        align-items: end;
+        gap: 1.2rem;
+        margin-bottom: 2.5rem;
+        padding: 0 1rem;
+    }
+    .podium-item {
+        background: #fff;
+        border-radius: 1.1rem;
+        padding: 1.5rem 1.5rem 1.2rem;
+        text-align: center;
+        box-shadow: 0 4px 20px rgba(0,0,0,.06);
+        transition: all .4s ease;
+        position: relative;
+        width: 200px;
+    }
+    .podium-item:hover { transform: translateY(-6px); box-shadow: 0 12px 35px rgba(0,0,0,.1); }
+    .podium-1 { order: 2; }
+    .podium-2 { order: 1; }
+    .podium-3 { order: 3; }
+
+    .podium-rank {
+        position: absolute;
+        top: -14px; left: 50%;
+        transform: translateX(-50%);
+        width: 32px; height: 32px;
+        border-radius: 50%;
+        display: grid; place-items: center;
+        font-weight: 800; font-size: .85rem;
+        color: #fff;
+    }
+    .podium-1 .podium-rank {
+        background: linear-gradient(135deg, #ffd700, #e6a817);
+        box-shadow: 0 4px 12px rgba(255,215,0,.4);
+        width: 38px; height: 38px;
+        font-size: 1rem;
+        top: -18px;
+    }
+    .podium-2 .podium-rank {
+        background: linear-gradient(135deg, #c0c0c0, #a8a8a8);
+        box-shadow: 0 4px 12px rgba(192,192,192,.4);
+    }
+    .podium-3 .podium-rank {
+        background: linear-gradient(135deg, #cd7f32, #b36b29);
+        box-shadow: 0 4px 12px rgba(205,127,50,.4);
+    }
+
+    .podium-avatar {
+        width: 60px; height: 60px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #91B893, #7aa67c);
+        display: grid; place-items: center;
+        color: #fff;
+        font-weight: 800;
+        font-size: 1.3rem;
+        margin: .5rem auto .6rem;
+    }
+    .podium-1 .podium-avatar {
+        width: 72px; height: 72px; font-size: 1.5rem;
+        border: 3px solid #ffd700;
+    }
+
+    .podium-name {
+        font-weight: 700; font-size: .88rem;
+        color: #2A3638;
+        margin-bottom: .15rem;
+    }
+    .podium-badge {
+        font-size: .72rem;
+        color: #94a3b8;
+        margin-bottom: .5rem;
+    }
+    .podium-score {
+        font-size: 1.3rem; font-weight: 900;
+        color: #E54A5F;
+    }
+    .podium-1 .podium-score { font-size: 1.5rem; }
+    .podium-score small {
+        font-size: .65rem; font-weight: 600;
+        color: #94a3b8;
+    }
+
+    /* Full leaderboard table */
+    .leaderboard-table-wrapper {
+        background: #fff;
+        border-radius: 1.1rem;
+        box-shadow: 0 2px 12px rgba(0,0,0,.05);
+        overflow: hidden;
+    }
+    .leaderboard-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .leaderboard-table thead th {
+        background: #faf7f3;
+        font-size: .72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+        color: #94a3b8;
+        padding: .9rem 1.2rem;
+        border-bottom: 2px solid #f1ece5;
+    }
+    .leaderboard-table tbody tr {
+        transition: all .2s ease;
+    }
+    .leaderboard-table tbody tr:hover {
+        background: #fdfbf8;
+    }
+    .leaderboard-table tbody td {
+        padding: .85rem 1.2rem;
+        font-size: .88rem;
+        color: #475569;
+        border-bottom: 1px solid #f5f0ea;
+        vertical-align: middle;
+    }
+    .leaderboard-rank {
+        font-weight: 800;
+        font-size: 1rem;
+        color: #2A3638;
+        width: 50px;
+        text-align: center;
+    }
+    .leaderboard-rank.gold { color: #e6a817; }
+    .leaderboard-rank.silver { color: #a8a8a8; }
+    .leaderboard-rank.bronze { color: #cd7f32; }
+
+    .leaderboard-user {
+        display: flex; align-items: center; gap: .7rem;
+    }
+    .leaderboard-avatar-sm {
+        width: 36px; height: 36px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #E5C6A4, #d4b593);
+        display: grid; place-items: center;
+        color: #fff; font-weight: 700; font-size: .78rem;
+        flex-shrink: 0;
+    }
+    .leaderboard-user-name {
+        font-weight: 600; color: #2A3638;
+    }
+    .leaderboard-user-badge {
+        font-size: .72rem; color: #94a3b8;
+    }
+    .leaderboard-points {
+        font-weight: 800;
+        color: #E54A5F;
+        font-size: 1rem;
+    }
+    .leaderboard-highlight {
+        background: linear-gradient(90deg, rgba(145,184,147,.06), transparent) !important;
+    }
+
+    .reputation-guide {
+        margin-top: 2rem;
+        background: #fff;
+        border-radius: 1.1rem;
+        padding: 1.5rem 2rem;
+        box-shadow: 0 2px 12px rgba(0,0,0,.05);
+    }
+    .reputation-guide h4 {
+        font-size: 1rem; font-weight: 800;
+        color: #2A3638; margin-bottom: 1rem;
+        display: flex; align-items: center; gap: .5rem;
+    }
+    .rep-tiers {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+        gap: .8rem;
+    }
+    .rep-tier {
+        background: #faf7f3;
+        border-radius: .7rem;
+        padding: .8rem;
+        text-align: center;
+    }
+    .rep-tier-icon { font-size: 1.5rem; margin-bottom: .3rem; }
+    .rep-tier-name { font-weight: 700; font-size: .82rem; color: #2A3638; }
+    .rep-tier-points { font-size: .7rem; color: #94a3b8; }
+
+    .points-breakdown {
+        display: flex; flex-wrap: wrap; gap: .8rem;
+        margin-top: 1.2rem;
+    }
+    .point-item {
+        display: flex; align-items: center; gap: .4rem;
+        font-size: .8rem; color: #64748b;
+        background: #fdfbf8;
+        padding: .4rem .8rem;
+        border-radius: .5rem;
+    }
+    .point-item .pts {
+        font-weight: 800;
+        color: #91B893;
+    }
+
+    @media (max-width: 640px) {
+        .podium { flex-wrap: wrap; }
+        .podium-item { width: 100%; order: unset !important; }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+    <a href="{{ path('app_boycott_index') }}" class="back-link">
+        <i class="bi bi-arrow-left"></i> {{ 'boycott.back_to_list'|trans }}
+    </a>
+
+    <div class="leaderboard-hero">
+        <h2>🏆 {{ 'boycott.community_leaderboard'|trans }}</h2>
+        <p>{{ 'boycott.community_desc'|trans }}</p>
+    </div>
+
+    {# Top 3 Podium #}
+    {% if topUsers|length >= 3 %}
+        <div class="podium">
+            {% for i in [1, 0, 2] %}
+                {% set user = topUsers[i] %}
+                <div class="podium-item podium-{{ i + 1 }}">
+                    <div class="podium-rank">{{ i + 1 }}</div>
+                    <div class="podium-avatar">
+                        {{ (user.prenom ?? user.email)|first|upper }}
+                    </div>
+                    <div class="podium-name">{{ user.prenom ?? '' }} {{ user.nom ?? '' }}</div>
+                    <div class="podium-badge">{{ user.reputationBadge }}</div>
+                    <div class="podium-score">
+                        {{ user.reputation }}
+                        <small>{{ 'boycott.pts'|trans }}</small>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {# Full ranking table #}
+    <div class="leaderboard-table-wrapper">
+        <table class="leaderboard-table">
+            <thead>
+                <tr>
+                    <th style="width:60px;text-align:center">{{ 'boycott.rank'|trans }}</th>
+                    <th>{{ 'boycott.member'|trans }}</th>
+                    <th style="text-align:right">{{ 'boycott.reputation'|trans }}</th>
+                    <th style="text-align:center">{{ 'boycott.badge'|trans }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in topUsers %}
+                    <tr class="{{ app.user and app.user.id == user.id ? 'leaderboard-highlight' : '' }}">
+                        <td>
+                            <span class="leaderboard-rank {{ loop.index == 1 ? 'gold' : (loop.index == 2 ? 'silver' : (loop.index == 3 ? 'bronze' : '')) }}">
+                                {% if loop.index <= 3 %}
+                                    {% if loop.index == 1 %}🥇{% elseif loop.index == 2 %}🥈{% else %}🥉{% endif %}
+                                {% else %}
+                                    {{ loop.index }}
+                                {% endif %}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="leaderboard-user">
+                                <div class="leaderboard-avatar-sm">{{ (user.prenom ?? user.email)|first|upper }}</div>
+                                <div>
+                                    <div class="leaderboard-user-name">{{ user.prenom ?? '' }} {{ user.nom ?? '' }}</div>
+                                    <div class="leaderboard-user-badge">{{ user.email }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td style="text-align:right">
+                            <span class="leaderboard-points">{{ user.reputation }}</span>
+                        </td>
+                        <td style="text-align:center">
+                            <span style="font-size:1.2rem">{{ user.reputationBadge }}</span>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="4" style="text-align:center;padding:3rem;color:#94a3b8">
+                            <i class="bi bi-people" style="font-size:2rem;display:block;margin-bottom:.5rem"></i>
+                            {{ 'boycott.no_contributors'|trans }}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {# Reputation guide #}
+    <div class="reputation-guide">
+        <h4><i class="bi bi-info-circle" style="color:#91B893"></i> {{ 'boycott.how_earn_points'|trans }}</h4>
+        <div class="rep-tiers">
+            <div class="rep-tier">
+                <div class="rep-tier-icon">👋</div>
+                <div class="rep-tier-name">{{ 'boycott.beginner'|trans }}</div>
+                <div class="rep-tier-points">0 - 4 {{ 'boycott.pts'|trans }}</div>
+            </div>
+            <div class="rep-tier">
+                <div class="rep-tier-icon">👤</div>
+                <div class="rep-tier-name">{{ 'boycott.new_member'|trans }}</div>
+                <div class="rep-tier-points">5 - 19 {{ 'boycott.pts'|trans }}</div>
+            </div>
+            <div class="rep-tier">
+                <div class="rep-tier-icon">🌱</div>
+                <div class="rep-tier-name">{{ 'boycott.engaged_member'|trans }}</div>
+                <div class="rep-tier-points">20 - 49 {{ 'boycott.pts'|trans }}</div>
+            </div>
+            <div class="rep-tier">
+                <div class="rep-tier-icon">⭐</div>
+                <div class="rep-tier-name">{{ 'boycott.active_contributor'|trans }}</div>
+                <div class="rep-tier-points">50 - 99 {{ 'boycott.pts'|trans }}</div>
+            </div>
+            <div class="rep-tier">
+                <div class="rep-tier-icon">🏆</div>
+                <div class="rep-tier-name">{{ 'boycott.expert'|trans }}</div>
+                <div class="rep-tier-points">100+ {{ 'boycott.pts'|trans }}</div>
+            </div>
+        </div>
+        <div class="points-breakdown">
+            <div class="point-item"><span class="pts">+2</span> {{ 'boycott.earn_suggest_boycott'|trans }}</div>
+            <div class="point-item"><span class="pts">+3</span> {{ 'boycott.earn_suggest_alt'|trans }}</div>
+            <div class="point-item"><span class="pts">+5</span> {{ 'boycott.earn_approved'|trans }}</div>
+            <div class="point-item"><span class="pts">+1</span> {{ 'boycott.earn_upvote'|trans }}</div>
+            <div class="point-item"><span class="pts">+1</span> {{ 'boycott.earn_vote'|trans }}</div>
+        </div>
+    </div>
+{% endblock %}
